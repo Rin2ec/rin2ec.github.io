@@ -1,7 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello World</title>
+</head>
 <body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
+    <h1>Hello World</h1>
+    <p>I'm hosted with GitHub Pages.</p>
+
+    <script>
+        // Parse the token from URL hash if it exists
+        window.addEventListener('load', () => {
+            const hash = window.location.hash;
+            if (hash && hash.includes('access_token')) {
+                const token = new URLSearchParams(hash.slice(1)).get('access_token');
+                // 將 token 傳回 A 頁面
+                window.opener.postMessage({ token: token }, 'https://www.twitch.tv/popout/rin2ec/extensions/zrofpjzd8mx6hhhlnsyytuc336zfmu-0.0.1/panel');
+                window.close();
+            }
+        });
+    </script>
 </body>
 </html>
