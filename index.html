@@ -16,7 +16,8 @@
                 const token = new URLSearchParams(hash.slice(1)).get('access_token');
                 // 將 token 傳回 A 頁面
                 window.opener.postMessage({ token: token }, 'https://www.twitch.tv/popout/rin2ec/extensions/zrofpjzd8mx6hhhlnsyytuc336zfmu-0.0.1/panel');
-                window.close();
+                console.log('Token :', token);
+                //window.close();
             }
         });
     </script>
