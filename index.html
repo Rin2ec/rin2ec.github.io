@@ -14,10 +14,11 @@
             const hash = window.location.hash;
             if (hash && hash.includes('access_token')) {
                 const token = new URLSearchParams(hash.slice(1)).get('access_token');
-                // 將 token 傳回 A 頁面
-                window.opener.postMessage({ token: token }, 'https://www.twitch.tv/popout/rin2ec/extensions/zrofpjzd8mx6hhhlnsyytuc336zfmu-0.0.1/panel');
-                console.log('Token :', token);
-                //window.close();
+                // Redirect to Twitch panel with token as query parameter
+                const twitchExtensionURL = 'https://www.twitch.tv/rin2ec';
+                const redirectURL = `${twitchExtensionURL}?access_token=${token}`;
+                window.location.href = redirectURL;
+                console.log('access_token:', token);
             }
         });
     </script>
