@@ -16,7 +16,7 @@
                 const token = new URLSearchParams(hash.slice(1)).get('access_token');
                 // Redirect to Twitch panel with token as query parameter
                 const twitchExtensionURL = 'https://www.twitch.tv/popout/rin2ec/extensions/zrofpjzd8mx6hhhlnsyytuc336zfmu-0.0.1/panel';
-                const redirectURL = `${twitchExtensionURL}?access_token=${token}`;
+                const redirectURL = `${twitchExtensionURL}#access_token=${token}`;
                 window.location.href = redirectURL;
                 console.log('access_token:', token);
             }
