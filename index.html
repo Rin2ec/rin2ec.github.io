@@ -7,6 +7,7 @@
 <body>
     <h1>Hello World</h1>
     <p>I'm hosted with GitHub Pages.</p>
+    <p id="token-display"></p> <!-- 新增顯示 token 的元素 -->
 
     <script>
         // Parse the token from URL hash if it exists
@@ -14,10 +15,8 @@
             const hash = window.location.hash;
             if (hash && hash.includes('access_token')) {
                 const token = new URLSearchParams(hash.slice(1)).get('access_token');
-                // Redirect to Twitch panel with token as query parameter
-                const twitchExtensionURL = 'https://www.twitch.tv/rin2ec';
-                const redirectURL = `${twitchExtensionURL}?access_token=${token}`;
-                window.location.href = redirectURL;
+                // 在頁面上顯示 token
+                document.getElementById('token-display').innerText = 'Access Token: ' + token;
                 console.log('access_token:', token);
             }
         });
