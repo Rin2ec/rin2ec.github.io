@@ -21,7 +21,7 @@
         }
 
         .token-display {
-            background-color: #1e88e5; /* 深藍色背景 */
+            background-color: #ffeb3b; /* 黃色背景 */
             padding: 10px;
             border-radius: 5px;
             cursor: pointer;
@@ -30,14 +30,33 @@
         }
 
         .token-display:hover {
-            background-color: #1976d2; /* 深一點的深藍色 */
+            background-color: #fbc02d; /* 深一點的黃色 */
+        }
+
+        .message-container {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #2196F3; /* 藍色邊框 */
+            border-radius: 5px;
+            background-color: #1e88e5; /* 深藍色背景 */
+            color: white;
+            display: none; /* 初始隱藏 */
+        }
+        .message-container.active {
+            display: block; /* 顯示訊息 */
+        }
+        .message-container p {
+            margin-bottom: 5px;
         }
     </style>
 </head>
 <body>
     <h1>授權碼頁面</h1>
-    <p>點選授權碼複製</p>
-    <p id="token-display" class="token-display"></p>
+    <p><span class="token-display" id="copyToken">點選授權碼複製</span></p>
+    <p id="token-display"></p> <!-- 顯示 token 的元素 -->
+    <div class="message-container" id="messageContainer">
+        <p id="systemMessage"></p> <!-- 系統訊息 -->
+    </div>
 
     <script>
         // Parse the token from URL hash if it exists
@@ -50,7 +69,8 @@
                 tokenDisplay.innerText = 'Access Token: ' + token;
 
                 // 點選 token 進行複製
-                tokenDisplay.addEventListener('click', () => {
+                const copyToken = document.getElementById('copyToken');
+                copyToken.addEventListener('click', () => {
                     // 創建一個臨時的 textarea 元素
                     const textarea = document.createElement('textarea');
                     textarea.value = token;
@@ -60,9 +80,9 @@
                     document.body.removeChild(textarea);
 
                     // 顯示複製完成的提示
-                    tokenDisplay.innerText = '已複製: ' + token;
+                    copyToken.innerText = '已複製: ' + token;
                     setTimeout(() => {
-                        tokenDisplay.innerText = 'Access Token: ' + token;
+                        copyToken.innerText = '點選授權碼複製';
                     }, 1500); // 1.5 秒後還原顯示
                 });
 
