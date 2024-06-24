@@ -75,6 +75,11 @@
                 // 點選 token 進行複製
                 const copyToken = document.getElementById('copyToken');
                 copyToken.addEventListener('click', () => {
+                    if (typeof token === 'undefined' || token === null || token === '') {
+                    copyToken.innerText = '⚠️錯誤：無授權碼';
+                    return;
+                    }
+
                     // 創建一個臨時的 textarea 元素
                     const textarea = document.createElement('textarea');
                     textarea.value = token;
