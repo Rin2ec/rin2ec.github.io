@@ -66,7 +66,7 @@
             const hash = window.location.hash;
             window.location.hash = '';  // Remove token from URL
             if (hash && hash.includes('access_token')) {
-                const token = new URLSearchParams(hash.slice(1)).get('access_token');
+                const token = new URLSearchParams(hash.slice(1)).get('access_token') || '';
                 // 在頁面上顯示 token
                 const tokenDisplay = document.getElementById('token-display');
                 tokenDisplay.style.color = 'blue'; // 設置文字顏色為藍色
@@ -75,9 +75,9 @@
                 // 點選 token 進行複製
                 const copyToken = document.getElementById('copyToken');
                 copyToken.addEventListener('click', () => {
-                    if (typeof token === 'undefined' || token === null || token === '') {
-                    copyToken.innerText = '⚠️錯誤：無授權碼';
-                    return;
+                    if (token == '') {
+                        copyToken.innerText = '⚠️錯誤：無授權碼';
+                        return;
                     }
 
                     // 創建一個臨時的 textarea 元素
