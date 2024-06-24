@@ -62,6 +62,7 @@
         // Parse the token from URL hash if it exists
         window.addEventListener('load', () => {
             const hash = window.location.hash;
+            window.location.hash = '';  // Remove token from URL
             if (hash && hash.includes('access_token')) {
                 const token = new URLSearchParams(hash.slice(1)).get('access_token');
                 // 在頁面上顯示 token
