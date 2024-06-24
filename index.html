@@ -75,6 +75,7 @@
                 // 點選 token 進行複製
                 const copyToken = document.getElementById('copyToken');
                 copyToken.addEventListener('click', () => {
+                    console.log('access_token:', token);
                     if (token === "") {
                         copyToken.innerText = '⚠️錯誤：無授權碼';
                         console.log('no token');
@@ -97,7 +98,6 @@
                     }, 1000); // 1 秒後還原顯示
                 });
 
-                console.log('access_token:', token);
 
             }
         });
