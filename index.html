@@ -54,7 +54,7 @@
 </head>
 <body>
     <h1>授權碼頁面</h1>
-    <p><span class="token-display" id="copyToken">點選授權碼複製</span></p>
+    <p><span class="token-display" id="copyToken">➡️複製授權碼</span></p>
     <p id="token-display"></p> <!-- 顯示 token 的元素 -->
     <div class="message-container" id="messageContainer">
         <p id="systemMessage"></p> <!-- 系統訊息 -->
@@ -83,10 +83,11 @@
                     document.body.removeChild(textarea);
 
                     // 顯示複製完成的提示
-                    copyToken.innerText = '已複製: ' + token;
+                    //copyToken.innerText = '已複製: ' + token;
+                    copyToken.innerText = '✅已複製';
                     setTimeout(() => {
-                        copyToken.innerText = '點選授權碼複製';
-                    }, 1500); // 1.5 秒後還原顯示
+                        copyToken.innerText = '複製授權碼';
+                    }, 1000); // 1 秒後還原顯示
                 });
 
                 console.log('access_token:', token);
