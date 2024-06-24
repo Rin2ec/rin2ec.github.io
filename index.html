@@ -75,13 +75,7 @@
                 // 點選 token 進行複製
                 const copyToken = document.getElementById('copyToken');
                 copyToken.addEventListener('click', () => {
-                    console.log('access_token:', token);
-                    if (token === "") {
-                        copyToken.innerText = '⚠️錯誤：無授權碼';
-                        console.log('no token');
-                        return;
-                    }
-
+                    //console.log('access_token:', token);
                     // 創建一個臨時的 textarea 元素
                     const textarea = document.createElement('textarea');
                     textarea.value = token;
@@ -99,6 +93,10 @@
                 });
 
 
+            }else{
+                    const copyToken = document.getElementById('copyToken');
+                    copyToken.innerText = '⚠️錯誤：無授權碼';
+                    console.log('no token');
             }
         });
     </script>
