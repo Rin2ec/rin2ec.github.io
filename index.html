@@ -2,12 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Hello World v3</title>
+    <title>授權碼</title>
+    <style>
+        body {
+            font-family: "Microsoft JhengHei", "微軟正黑體", Arial, sans-serif;
+            padding: 20px;
+            background-color: rgba(100, 181, 246, 0.3); /* 淡藍色透明 */
+            color: white;
+            text-align: center;
+        }
+
+        h1 {
+            color: #2196F3; /* 藍色 */
+        }
+
+        p {
+            margin-bottom: 10px;
+        }
+
+        .token-display {
+            background-color: #1e88e5; /* 深藍色背景 */
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+        }
+
+        .token-display:hover {
+            background-color: #1976d2; /* 深一點的深藍色 */
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello World</h1>
-    <p>I'm hosted with GitHub Pages.</p>
-    <p id="token-display"></p> <!-- 新增顯示 token 的元素 -->
+    <h1>授權碼頁面</h1>
+    <p>點選授權碼複製</p>
+    <p id="token-display" class="token-display"></p>
 
     <script>
         // Parse the token from URL hash if it exists
@@ -16,7 +46,26 @@
             if (hash && hash.includes('access_token')) {
                 const token = new URLSearchParams(hash.slice(1)).get('access_token');
                 // 在頁面上顯示 token
-                document.getElementById('token-display').innerText = 'Access Token: ' + token;
+                const tokenDisplay = document.getElementById('token-display');
+                tokenDisplay.innerText = 'Access Token: ' + token;
+
+                // 點選 token 進行複製
+                tokenDisplay.addEventListener('click', () => {
+                    // 創建一個臨時的 textarea 元素
+                    const textarea = document.createElement('textarea');
+                    textarea.value = token;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+
+                    // 顯示複製完成的提示
+                    tokenDisplay.innerText = '已複製: ' + token;
+                    setTimeout(() => {
+                        tokenDisplay.innerText = 'Access Token: ' + token;
+                    }, 1500); // 1.5 秒後還原顯示
+                });
+
                 console.log('access_token:', token);
             }
         });
