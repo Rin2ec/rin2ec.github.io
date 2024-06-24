@@ -54,7 +54,7 @@
 </head>
 <body>
     <h1>授權碼頁面</h1>
-    <p><span class="token-display" id="copyToken">➡️複製授權碼</span></p>
+    <p><span class="token-display" id="copyToken">👆點擊複製授權碼</span></p>
     <p id="token-display"></p> <!-- 顯示 token 的元素 -->
     <div class="message-container" id="messageContainer">
         <p id="systemMessage"></p> <!-- 系統訊息 -->
@@ -69,7 +69,8 @@
                 const token = new URLSearchParams(hash.slice(1)).get('access_token');
                 // 在頁面上顯示 token
                 const tokenDisplay = document.getElementById('token-display');
-                tokenDisplay.innerText = 'Access Token: ' + token;
+                tokenDisplay.style.color = 'blue'; // 設置文字顏色為藍色
+                tokenDisplay.innerText = '🔑授權碼: ' + token;
 
                 // 點選 token 進行複製
                 const copyToken = document.getElementById('copyToken');
@@ -86,7 +87,7 @@
                     //copyToken.innerText = '已複製: ' + token;
                     copyToken.innerText = '✅已複製';
                     setTimeout(() => {
-                        copyToken.innerText = '複製授權碼';
+                        copyToken.innerText = '👆點擊複製授權碼';
                     }, 1000); // 1 秒後還原顯示
                 });
 
