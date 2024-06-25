@@ -35,6 +35,14 @@
             background-color: #fbc02d; /* 深一點的黃色 */
         }
 
+        .token-display:active {
+            background-color: #ffeb3b;
+            background-size: 100%;
+            transition: background 0s;
+            transform: scale(0.85);
+        }
+
+
         .message-container {
             margin-top: 20px;
             padding: 10px;
@@ -86,7 +94,7 @@
 
                     // 顯示複製完成的提示
                     //copyToken.innerText = '已複製: ' + token;
-                    copyToken.innerText = '✅複製成功 請回到設定頁面貼上及儲存💾';
+                    copyToken.innerText = '✅複製成功 🔧請回到設定頁面貼上及儲存💾';
                     setTimeout(() => {
                         copyToken.innerText = '👆點擊複製授權碼';
                     }, 3000); // 3 秒後還原顯示
