@@ -5,7 +5,7 @@
     <title>授權碼</title>
     <style>
         body {
-            font-family: "Microsoft JhengHei", "微軟正黑體", Arial, sans-serif;
+            font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
             padding: 20px;
             background-color: rgba(100, 181, 246, 0.3); /* 淡藍色透明 */
             color: white;
@@ -18,6 +18,7 @@
 
         p {
             margin-bottom: 10px;
+            font-size: 30px; /* 設定字體大小為10px */
         }
 
         .token-display {
@@ -54,6 +55,7 @@
         }
         .message-container.active {
             display: block; /* 顯示訊息 */
+            font-size: 20px; /* 設定字體大小為10px */
         }
         .message-container p {
             margin-bottom: 5px;
@@ -61,7 +63,7 @@
     </style>
 </head>
 <body>
-    <h1>授權碼頁面</h1>
+    <h1>授權碼</h1>
     <p><span class="token-display" id="copyToken">👆點擊複製授權碼</span></p>
     <p id="token-display"></p> <!-- 顯示 token 的元素 -->
     <div class="message-container" id="messageContainer">
