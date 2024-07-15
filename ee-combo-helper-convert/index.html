@@ -17,16 +17,23 @@
             align-items: center;
             margin: 0;
         }
-        .container {
-            background: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 20px 30px;
-            width: 90%;
-            max-width: 600px;
-            text-align: center;
-            margin-top: 35px; /* 新增的 margin-top */
-        }
+	.container {
+	    background: #f0f0f0; /* 質感灰色 */
+	    border-radius: 15px;
+	    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	    padding: 20px 30px;
+	    width: 90%;
+	    max-width: 600px;
+	    text-align: center;
+	    margin-top: 35px; /* 新增的 margin-top */
+	    border: 1px solid #dcdcdc; /* 輕微的邊框來增強質感 */
+	    transition: all 0.3s ease; /* 添加過渡效果以增強互動感 */
+	}
+	
+	.container:hover {
+	    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15); /* 懸停時加深陰影效果 */
+	}
+
 
         title{
             font-size: 48px;
