@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>按鍵組合格式化</title>
+    <link rel="icon" href="icon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="icon.ico" type="image/x-icon">
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            background-color: #f3f4f6;
+            align-items: center;
+            margin: 0;
+        }
+        .container {
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px 30px;
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            margin-top: 35px; /* 新增的 margin-top */
+        }
+
+        title{
+            font-size: 48px;
+        }
+
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        h1 img {
+            margin-right: 1px;
+            height: 30px; /* 調整這個值以控制圖標的高度 */
+            width: 30px;  /* 調整這個值以控制圖標的寬度 */
+            position: relative; /* 設置相對定位 */
+            top: 3px; /* 調整這個值以移動圖標的Y軸位置 */
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px; /* 調整這個值以控制高度 */
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box; /* 確保 padding 不會影響高度 */
+            vertical-align: top; /* 確保文字對齊到頂部 */
+            font-size: 16px;
+            resize: none;
+            transition: border-color 0.3s;
+        }
+        textarea:focus {
+            border-color: #4a90e2;
+            outline: none;
+            box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
+        }
+        textarea::placeholder {
+            color: #aaa;
+        }
+        .output-container {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .output-container textarea {
+            background-color: #f9f9f9;
+            border-color: #ddd;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #4a90e2;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin: 0 10px;
+            font-weight:bold;
+        }
+        .btn:hover {
+            background-color: #357ab8;
+            transform: scale(1.05);
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        
+        .btn.success {
+            background-color: #4caf50;
+            transform: none; /* 避免動畫在變色時觸發 */
+        }
+
+        footer {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #555;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+
+<div class="container">
+    <h1>
+        <img src="icon.ico" alt="Icon">
+        按鍵組合格式化
+    </h1>
+    <textarea id="inputText" placeholder="輸入字串..."></textarea>
+    <div class="btn-container">
+        <button class="btn" id="copyBtn" onclick="copyText()">📑複製結果</button>
+        <button class="btn" id="exportBtn" onclick="exportText()">📥匯出檔案</button>
+    </div>
+    <textarea id="outputText" placeholder="輸出字串..." readonly></textarea>
+</div>
+<footer>
+    版本: 1.0 | 作者: 凜 | 有任何問題或建議歡迎於巴哈、實況上詢問!
+</footer>
+<script>
+    document.getElementById('inputText').addEventListener('input', function () {
+        const input = this.value;
+        const map = {
+            '左': 'LMB',
+            '右': 'RMB',
+            '鍵': '',
+            '>': ' ',
+            '-': '',
+            '\n': ' ' // 將換行符號替換為空白
+            //'\\bsh\\b': 'SHIFT', // 使用正則表達式進行完整匹配
+            //'\\bSHh\\b': 'SHIFT' // 使用正則表達式進行完整匹配
+        };
+        let output = input;
+        
+        // 第一階段轉換 : 根據對照表替換文字
+        for (const [key, value] of Object.entries(map)) {
+            const regex = new RegExp(key, 'g');
+            output = output.replace(regex, value);
+        }
+        output = output.toUpperCase(); // 將輸出文字轉換為大寫
+        
+        // 第二階段替換：檢查 LMB 和 RMB 前面是否有其他字串
+        output = output.replace(/(\w)(LMB|RMB)/g, '$1+$2');
+
+        // 第三階段替換：將 SH+ 轉換為 SHIFT+
+        output = output.replace(/SH\+/g, 'SHIFT+');
+
+        // 第四階段替換：移除所有非英文和數字的字符
+        output = output.replace(/[^A-Z0-9+ ]/gi, '');
+
+        // 第五階段替換：將超過兩個空白字符統一變為一個空白字符
+        output = output.replace(/\s{2,}/g, ' ');
+
+        // 第六階段替換：將所有兩個字母組成的字符串拆分成字母並用 + 號連結
+        output = output.replace(/\b([A-Z])([A-Z])\b/g, '$1+$2');
+        
+        // 第七階段替換：檢查 SHIFT 後是否有其他字母字符，用 + 分開
+        output = output.replace(/(SHIFT)(?=[A-Z])/g, '$1+');
+        //output = output.replace(/(SH)(?=[A-Z])/g, '$1+');
+
+        // 第八階段替換：將包含 SH 的字串替換為 SHIFT+
+        output = output.replace(/\bSH([A-Z])\b/g, 'SHIFT+$1');
+
+        
+        document.getElementById('outputText').value = output;
+    });
+    
+    function copyText() {
+        const outputText = document.getElementById('outputText');
+        outputText.select();
+        outputText.setSelectionRange(0, 99999); // For mobile devices
+        document.execCommand('copy');
+
+        const copyBtn = document.getElementById('copyBtn');
+        copyBtn.textContent = '✅複製成功!';
+        copyBtn.classList.add('success');
+        setTimeout(() => {
+            copyBtn.textContent = '🛠️複製結果';
+            copyBtn.classList.remove('success');
+        }, 3000);
+    }
+
+   function exportText() {
+        const outputText = document.getElementById('outputText').value;
+         if (outputText.trim().length === 0) {
+               alert('請輸入字串!')
+              return; // 防止匯出空內容
+          }
+        const blob = new Blob([outputText], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'output.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        //alert('匯出成功!請更改檔名與放入【key_combinations】資料夾中')
+        const exportBtn = document.getElementById('exportBtn');
+        exportBtn.textContent = '✅匯出成功!';
+        exportBtn.classList.add('success');
+        setTimeout(() => {
+            exportBtn.textContent = '📥匯出檔案';
+            exportBtn.classList.remove('success');
+        }, 3000);
+    }
+</script>
+
+</body>
+</html>
