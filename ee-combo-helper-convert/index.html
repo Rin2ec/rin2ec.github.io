@@ -143,6 +143,7 @@
         const map = {
             '左': 'LMB',
             '右': 'RMB',
+            '空白' :'SPACE',
             '鍵': '',
             '>': ' ',
             '-': '',
@@ -160,7 +161,7 @@
         output = output.toUpperCase(); // 將輸出文字轉換為大寫
         
         // 第二階段替換：檢查 LMB 和 RMB 前面是否有其他字串
-        output = output.replace(/(\w)(LMB|RMB)/g, '$1+$2');
+        output = output.replace(/(\w)(LMB|RMB|SPACE)/g, '$1+$2');
 
         // 第三階段替換：將 SH+ 轉換為 SHIFT+
         output = output.replace(/SH\+/g, 'SHIFT+');
