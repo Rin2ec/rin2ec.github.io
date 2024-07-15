@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>按鍵組合轉換器</title>
+    <title>按鍵組合格式化</title>
     <link rel="icon" href="icon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="icon.ico" type="image/x-icon">
     <style>
@@ -72,6 +72,23 @@
             font-family: 'Microsoft JhengHei', sans-serif;
             color: #aaa;
         }
+
+        #inputText {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            font-size: 16px; /* 設置字體大小 */
+            padding: 10px; /* 設置內距，讓輸入框看起來更美觀 */
+            border: 1px solid #ccc; /* 設置邊框 */
+            border-radius: 4px; /* 設置圓角 */
+        }
+
+        #outputText {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            font-size: 16px; /* 設置字體大小 */
+            padding: 10px; /* 設置內距，讓輸入框看起來更美觀 */
+            border: 1px solid #ccc; /* 設置邊框 */
+            border-radius: 4px; /* 設置圓角 */
+        }
+        
         .output-container {
             margin-top: 20px;
             text-align: left;
@@ -110,6 +127,8 @@
         }
         
         .btn.success {
+         	font-weight: bold;
+        	font-family: 'Microsoft JhengHei', sans-serif;
             background-color: #4caf50;
             transform: none; /* 避免動畫在變色時觸發 */
         }
@@ -129,7 +148,7 @@
 <div class="container">
     <h1>
         <img src="icon.ico" alt="Icon">
-        按鍵組合轉換器
+        按鍵組合格式化
     </h1>
     <textarea id="inputText" placeholder="請輸入按鍵組合...(Ex. W右 SHQ SF)"></textarea>
     <div class="btn-container">
