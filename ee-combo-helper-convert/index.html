@@ -127,12 +127,12 @@
         <img src="icon.ico" alt="Icon">
         按鍵組合格式化
     </h1>
-    <textarea id="inputText" placeholder="輸入字串..."></textarea>
+    <textarea id="inputText" placeholder="請輸入按鍵組合...(Ex. W右 SHQ SF)"></textarea>
     <div class="btn-container">
         <button class="btn" id="copyBtn" onclick="copyText()">📑複製結果</button>
         <button class="btn" id="exportBtn" onclick="exportText()">📥匯出檔案</button>
     </div>
-    <textarea id="outputText" placeholder="輸出字串..." readonly></textarea>
+    <textarea id="outputText" placeholder="格式化按鍵組合...(Ex. W+RMB SHIFT+Q S+F)" readonly></textarea>
 </div>
 <footer>
     作者: 凜 | 有任何問題或建議歡迎於巴哈、實況上詢問!
@@ -203,7 +203,7 @@
    function exportText() {
         const outputText = document.getElementById('outputText').value;
          if (outputText.trim().length === 0) {
-               alert('請輸入字串!')
+               alert('請輸入有效字串!')
               return; // 防止匯出空內容
           }
         const blob = new Blob([outputText], { type: 'text/plain' });
