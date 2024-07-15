@@ -2,7 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>伊伊遊戲小幫手授權碼</title>
+    <link rel="icon" href="icons/icon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="icons/icon.ico" type="image/x-icon">
+    <h1>
+        <img src="icon.ico" alt="Icon">
+        伊伊遊戲小幫手授權碼
+    </h1>
     <style>
         body {
             font-family: "Microsoft JhengHei";
@@ -13,7 +18,19 @@
         }
 
         h1 {
+            margin-bottom: 20px;
+            font-size: 32px;
             color: #2196F3; /* 藍色 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        h1 img {
+            margin-right: 5px;
+            height: 32px; /* 調整這個值以控制圖標的高度 */
+            width: 32px;  /* 調整這個值以控制圖標的寬度 */
+            position: relative; /* 設置相對定位 */
+            top: 2px; /* 調整這個值以移動圖標的Y軸位置 */
         }
 
         p {
@@ -64,7 +81,6 @@
     </style>
 </head>
 <body>
-    <h1>伊伊遊戲小幫手授權碼</h1>
     <p><span class="token-display" id="copyToken">👆點擊複製授權碼</span></p>
     <p id="token-display"></p> <!-- 顯示 token 的元素 -->
     <div class="message-container" id="messageContainer">
