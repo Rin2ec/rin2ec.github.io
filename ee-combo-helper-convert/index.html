@@ -167,7 +167,7 @@
 <footer>
     作者: 凜 | 有任何問題或建議歡迎於巴哈、實況上討論! <br>
     <a href="https://www.twitch.tv/shiyu2615"> 實況連結</a>
-    <a href="https://www.twitch.tv/shiyu2615"> 巴哈連結</a>
+    <a href="https://forum.gamer.com.tw/C.php?bsn=19017&snA=65245&tnum=2"> 巴哈文章連結</a>
 </footer>
 <script>
     document.getElementById('inputText').addEventListener('input', function () {
@@ -213,6 +213,10 @@
 
         // 第八階段替換：將包含 SH 的字串替換為 SHIFT+
         output = output.replace(/\bSH([A-Z])\b/g, 'SHIFT+$1');
+
+        // 第九階段：將 LMBRMB 轉換為 LMB+RMB 和 RMBLMB 轉換為 RMB+LMB
+        output = output.replace(/LMBRMB/g, 'LMB+RMB');
+        output = output.replace(/RMBLMB/g, 'RMB+LMB');
 
         
         document.getElementById('outputText').value = output;
