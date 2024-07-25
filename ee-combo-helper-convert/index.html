@@ -173,6 +173,7 @@
     document.getElementById('inputText').addEventListener('input', function () {
         const input = this.value;
         const map = {
+	    '或': '|',
             '左': 'LMB',
             '右': 'RMB',
             '空白' :'SPACE',
@@ -199,7 +200,7 @@
         output = output.replace(/SH\+/g, 'SHIFT+');
 
         // 第四階段替換：移除所有非英文和數字的字符
-        output = output.replace(/[^A-Z0-9+ ]/gi, '');
+        //output = output.replace(/[^A-Z0-9+ ]/gi, '');
 
         // 第五階段替換：將超過兩個空白字符統一變為一個空白字符
         output = output.replace(/\s{2,}/g, ' ');
