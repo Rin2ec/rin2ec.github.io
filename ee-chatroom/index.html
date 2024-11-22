@@ -90,7 +90,47 @@
                 transform: translateY(0);
             }
         }
+        .collapsible {
+            background-color: #0077b6;
+            color: white;
+            cursor: pointer;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .collapsible:hover {
+            background-color: #00b4d8;
+        }
+        .content {
+            padding: 0 15px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+            background-color: #1b263b;
+            border-radius: 4px;
+        }
     </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const collapsibles = document.querySelectorAll(".collapsible");
+            collapsibles.forEach(collapsible => {
+                collapsible.addEventListener("click", function() {
+                    this.classList.toggle("active");
+                    const content = this.nextElementSibling;
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    }
+                });
+            });
+        });
+    </script>
 </head>
 <body>
     <div class="container">
@@ -99,44 +139,44 @@
             <h2>🎉 I. 即時聊天室顯示功能</h2>
             <p style="color: #ffcc00;">提供觀眾更有趣、更即時的互動體驗，顯示重要聊天內容</p>
             <ul>
-                <li><span>過濾機器人與指令訊息：</span> 聊天室僅顯示重要訊息，不用擔心被洗頻。</li>
-                <li><span>連結與圖片顯示：</span> 自動將連結轉換為可點擊的超連結，顯示圖片連結中的圖片。</li>
-                <li><span>公告顯示：</span> 支援實況主發佈公告，包含可展開或折疊查看的功能。</li>
-                <li><span>標記提醒：</span> 被提及的觀眾會收到醒目效果通知。</li>
+                <li><span>1. 過濾機器人與指令訊息：</span> 聊天室僅顯示重要訊息，不用擔心被洗頻。</li>
+                <li><span>2. 連結與圖片顯示：</span> 自動將連結轉換為可點擊的超連結，顯示圖片連結中的圖片。</li>
+                <li><span>3. 公告顯示：</span> 支援實況主發佈公告，包含可展開或折疊查看的功能。</li>
+                <li><span>4. 標記提醒：</span> 被提及的觀眾會收到醒目效果通知。</li>
             </ul>
         </section>
 
         <section>
             <h2>✨ II. 即時互動功能</h2>
             <ul>
-                <li><span>表情反應系統：</span> 可對訊息進行表情反應，即時更新反應數量。</li>
-                <li><span>新訊息提示與快捷返回：</span> 當有新訊息時會顯示提示條，提供快速返回訊息底部的按鈕。</li>
-                <li><span>簽到公告：</span> 每當累積簽到或連續簽到達到一定天數時，會在聊天室裡公告，增加互動體驗！</li>
+                <li><span>1. 表情反應系統：</span> 可對訊息進行表情反應，即時更新反應數量。</li>
+                <li><span>2. 新訊息提示與快捷返回：</span> 當有新訊息時會顯示提示條，提供快速返回訊息底部的按鈕。</li>
+                <li><span>3. 簽到公告：</span> 每當累積簽到或連續簽到達到一定天數時，會在聊天室裡公告，增加互動體驗！</li>
             </ul>
         </section>
 
         <section>
             <h2>🔄 III. 連線功能</h2>
             <ul>
-                <li><span>WebSocket 即時連線：</span> 實現與伺服器的即時互動，包含自動重連、手動連線與中斷。</li>
-                <li><span>連線狀態顯示：</span> 即時顯示當前連線狀態及觀眾連線人數。</li>
+                <li><span>1. WebSocket 即時連線：</span> 實現與伺服器的即時互動，包含自動重連、手動連線與中斷。</li>
+                <li><span>2. 連線狀態顯示：</span> 即時顯示當前連線狀態及觀眾連線人數。</li>
             </ul>
         </section>
 
         <section>
             <h2>🎁 IV. 簽到查詢與抽獎功能</h2>
             <ul>
-                <li><span>簽到查詢：</span> 查詢當日簽到狀態、累積簽到天數與連續簽到天數。</li>
-                <li><span>簽到與抽獎互動：</span> 每日簽到後可參與抽獎，有機會獲得虛擬獎品。</li>
-                <li><span>抽獎紀錄查詢：</span> 提供最新 30 筆抽獎紀錄查詢，方便用戶了解自己的抽獎結果。</li>
+                <li><span>1. 簽到查詢：</span> 查詢當日簽到狀態、累積簽到天數與連續簽到天數。</li>
+                <li><span>2. 簽到與抽獎互動：</span> 每日簽到後可參與抽獎，有機會獲得虛擬獎品。</li>
+                <li><span>3. 抽獎紀錄查詢：</span> 提供最新 30 筆抽獎紀錄查詢，方便用戶了解自己的抽獎結果。</li>
             </ul>
         </section>
 
         <section>
             <h2>🔍 V. 外部 API 使用說明</h2>
             <ul>
-                <li><span>API 使用：</span> 儲存和管理用戶的互動資料，保障數據安全。</li>
-                <li><span>資料安全：</span> 所有資料僅用於內部顯示，確保用戶隱私。</li>
+                <li><span>1. API 使用：</span> 儲存和管理用戶的互動資料，保障數據安全。</li>
+                <li><span>2. 資料安全：</span> 所有資料僅用於內部顯示，確保用戶隱私。</li>
             </ul>
         </section>
 
@@ -147,6 +187,20 @@
                     A: 代表沒有進行授權，請點選伊伊聊天室右上角齒輪進行授權。
                 </li>
             </ul>
+        </section>
+
+        <section>
+            <h2>📝 變更紀錄</h2>
+            <button type="button" class="collapsible">版本 1.0.1</button>
+            <div class="content">
+                <ul>
+                    <li>1. 修復無法點擊訊息中的網址連結問題。</li>
+                    <li>2. 修復重複顯示相同訊息的問題，新增在訊息顯示前檢查是否與前者相同，若有則不顯示。</li>
+                    <li>3. 新增顯示簽到訊息功能，每當累積簽到或連續簽到達到一定天數時，會由互動元件在聊天室裡發布訊息，增加互動體驗！</li>
+                    <li>4. 新增開啟抽獎頁面時檢測是否有授權功能，如果無授權則跳出視窗提示用戶進行授權，若取消則無法開啟抽獎頁面。</li>
+                    <li>5. 新增API的獎品池鍵值，以防無獎品資料供抽取。</li>
+                </ul>
+            </div>
         </section>
 
         <div style="margin-top: 20px;">
