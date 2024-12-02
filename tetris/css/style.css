@@ -1,0 +1,190 @@
+.clearfix:before,
+.clearfix:after {
+    display: table;
+    content: "";
+    clear: both;
+}
+
+.container {
+    text-align: center;
+}
+
+h3 {
+    text-align: center;
+    font-weight: normal;
+    font-size: 20px;
+}
+.local,
+.remote {
+    margin: 20px 40px;
+    display: inline-block;
+}
+.local {
+    border-right: 2px solid lightgray;
+}
+
+.game {
+    width: 200px;
+    height: 400px;
+    background: #F2FAFF;
+    border: 1px solid black;
+    border-top: none;
+    position: relative;
+    float: left;
+}
+
+header {
+    margin-top: 20px;
+}
+
+header h2 {
+    font-weight: normal;
+    text-align: center;
+    font-size: 24px;
+}
+
+.introduce p {
+    font-size: 14px;
+    text-indent: 2rem;
+}
+.view-btn{
+    float: right;
+}
+.view{
+    /* 垂直排列 */
+    writing-mode: tb-rl;
+    -webkit-writing-mode: vertical-rl;      
+    writing-mode: vertical-rl;
+    letter-spacing: 5px;
+    vertical-align: middle;
+}
+footer{
+    margin-top: 60px;
+    text-align: center;
+    font-size: 12px;
+}
+footer p{
+    margin: 0;
+}
+ 
+
+.next {
+    width: 80px;
+    height: 80px;
+    background: #F2FAFF;
+    border: 1px solid blakc;
+    position: relative;
+}
+
+.info {
+    width: 150px;
+    float: left;
+    margin-left: 20px;
+}
+
+.score {
+    text-align: left;
+}
+
+.none,
+.current,
+.done {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    box-sizing: border-box;
+}
+
+.none {
+    background: #F2FAFF;
+}
+
+.current {
+    background: lightblue;
+    border: 1px solid black;
+}
+
+.done {
+    background: gray;
+    border: 1px solid black;
+}
+
+        .control-buttons {
+            display: grid;
+            grid-template-columns: 60px 60px 60px;
+            grid-template-rows: 60px 60px 60px;
+            gap: 30px;
+            margin-top: 20px;
+            justify-items: center;
+            align-items: center;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .control-buttons button {
+            background-color: #444;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1em;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            width: 80px;
+            height: 80px;
+        }
+
+        .control-buttons button:hover {
+            background-color: #666;
+            transform: translateY(-3px);
+        }
+
+        .control-buttons button:active {
+            background-color: #333;
+            transform: translateY(1px);
+        }
+
+        #btn-left {
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        #btn-rotate {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        #btn-right {
+            grid-column: 3;
+            grid-row: 2;
+        }
+
+        #btn-down {
+            grid-column: 2;
+            grid-row: 2;
+        }
+
+        #btn-fall {
+            grid-column: 2;
+            grid-row: 3;
+        }
+
+        .join-btn {
+            margin: 20px;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            background-color: #222;
+            color: #00e5ff;
+            border: 2px solid #00e5ff;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 229, 255, 0.5);
+        }
+
+        .join-btn:hover {
+            background-color: #00e5ff;
+            color: #0e0e0e;
+        }
