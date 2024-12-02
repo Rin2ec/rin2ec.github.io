@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Tetris</title>
+
+    <!-- import css files -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+    <header>
+        <h2>Tetris</h2>
+        <!-- 遊戲說明區塊 
+        <button class="btn view-btn" data-toggle="modal" data-target="#myModal">
+            <span class="view">遊戲說明</span>
+        </button>
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <strong>遊戲介紹</strong>
+                    </div>
+                    <div class="modal-body introduce">
+                        <p>遊戲為回合對戰，當一個玩家進入後自動進入等待狀態，另一個玩家進入則自動開始遊戲；</p>
+                        <p>基本操作： ↑：旋轉、←：左移、→：右移、空格：快速下墜； </p>
+                        <p>提示：必須在至少有相應進入遊戲介面才可以開始，如果您只想瀏覽效果，則可以將url位址複製到新的頁面即可設定成功。
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+         -->
+    </header>
+
+
+    <div class="container">
+        <button id="join-btn" class="join-btn">加入遊戲</button>
+        <div id="waiting"></div>
+        <!-- 游戏区域 -->
+        <div class="local clearfix">
+            <h3>P1</h3>
+            <div class="game" id="local_game"></div>
+            <div class="info">
+                <!-- 下一个方块 -->
+                <div class="next" id="local_next"></div>
+                <!-- 游戏信息 -->
+                <div class="score">
+                    <p>時間：
+                        <span id="local_time">0</span>秒</p>
+                    <p>分數：
+                        <span id="local_score">0</span>分</p>
+                    <div id="local_gameover"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="remote clearfix">
+            <h3>P2</h3>
+            <div class="game" id="remote_game"></div>
+            <div class="info">
+                <!-- 下一个方块 -->
+                <div class="next" id="remote_next"></div>
+                <!-- 游戏信息 -->
+                <div class="score">
+                    <p>時間：
+                        <span id="remote_time">0</span>秒</p>
+                    <p>分數：
+                        <span id="remote_score">0</span>分</p>
+                    <div id="remote_gameover"></div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 控制按鈕區域 -->
+    <div class="control-buttons">
+        <button id="btn-left">左移(←)</button>
+        <button id="btn-rotate">旋轉</button>
+        <button id="btn-right">右移(→)</button>
+        <button id="btn-down">下移(↓)</button>
+        <button id="btn-fall">快速下墜</button>
+    </div>
+
+    <footer>
+        <p>test &copy; 2024.12.02</p>
+        <p>twitch： <a href="http:\\...">http:\\...</a></p>
+    </footer>
+
+    <script src="js/socket.io.js"></script>
+    <script src="js/square.js"></script>
+    <script src="js/squareFactory.js"></script>
+    <script src="js/local.js"></script>
+    <script src="js/remote.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+</body>
+
+</html>
