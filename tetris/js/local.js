@@ -2,7 +2,7 @@ let Local = function (socket) {
     // 游戏对象
     let game;
     // 时间间隔
-    const INTERVAL = 200;
+    const INTERVAL = 500;
     // 定时器
     let timer = null;
     // 时间计数器
@@ -10,32 +10,38 @@ let Local = function (socket) {
     // 时间
     let time = 0;
 
-    // 绑定键盘事件
-    let bindKeyEvent = function () {
-        document.onkeydown = function (e) {
-            if (e.keyCode == 37) {
-                // left
+// 绑定键盘事件
+let bindKeyEvent = function () {
+    document.onkeydown = function (e) {
+        switch (e.keyCode) {
+            case 37: // left arrow
+            case 65: // 'A'
                 game.left();
                 socket.emit("left");
-            } else if (e.keyCode == 38) {
-                // up
+                break;
+            case 38: // up arrow
+            case 87: // 'W'
                 game.rotate();
                 socket.emit("rotate");
-            } else if (e.keyCode == 39) {
-                // right
+                break;
+            case 39: // right arrow
+            case 68: // 'D'
                 game.right();
                 socket.emit("right");
-            } else if (e.keyCode == 40) {
-                // down
+                break;
+            case 40: // down arrow
+            case 83: // 'S'
                 game.down();
                 socket.emit("down");
-            } else if (e.keyCode == 32) {
-                // space
+                break;
+            case 32: // space
                 game.fall();
                 socket.emit("fall");
-            }
+                break;
         }
     };
+};
+
 
         document.getElementById('btn-left').addEventListener('click', function () {
             game.left();
