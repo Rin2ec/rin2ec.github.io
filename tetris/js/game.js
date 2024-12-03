@@ -4,7 +4,7 @@ let Game = function () {
     let nextDiv;
     let timeDiv;
     let scoreDiv;
-    let resultDiv
+    let resultDiv;
     // 分数
     let score = 0;
     // 游戏矩阵
@@ -50,7 +50,7 @@ let Game = function () {
             return false;
         } else if (pos.y + y >= gameData[0].length) {
             return false;
-        } else if (gameData[pos.x + x][pos.y + y] == 1) {
+        } else if (gameData[pos.x + x][pos.y + y] == 1 || gameData[pos.x + x][pos.y + y] == 3) { // 修改: 考虑干扰行
             return false;
         } else {
             return true;
@@ -173,6 +173,8 @@ let Game = function () {
                     divs[i][j].className = "done";
                 } else if (data[i][j] == 2) {
                     divs[i][j].className = "current";
+                } else if (data[i][j] == 3) { // 新增：处理干扰行的样式
+                    divs[i][j].className = "interference";
                 }
             }
         }
@@ -206,7 +208,7 @@ let Game = function () {
         for (let i = gameData.length - 1; i >= 0; i--) {
             let clear = true;
             for (let j = 0; j < gameData[0].length; j++) {
-                if (gameData[i][j] != 1) {
+                if (gameData[i][j] != 1) { // 修改：忽略干扰行
                     clear = false;
                     break;
                 }
@@ -283,15 +285,16 @@ let Game = function () {
         for(let i = 0; i < gameData.length - lines.length; i++){
             gameData[i] = gameData[i + lines.length];
         }
-        for(let i = 0; i < lines.length; i ++){
-            gameData[gameData.length - lines.length + i] = lines[i];
+        for(let i = 0; i < lines.length; i++){
+            for (let j = 0; j < lines[i].length; j++) {
+                gameData[gameData.length - lines.length + i][j] = 3; // 修改：标记为干扰行
+            }
         }
         cur.origin.x = cur.origin.x - lines.length;
         if(cur.origin.x < 0){
             cur.origin.x = 0;
         }
         refreshDiv(gameData, gameDivs);
-
     };
 
     // 导出API

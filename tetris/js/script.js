@@ -46,7 +46,7 @@ function joinGame() {
 
   socket.on("leave", function () {
     document.getElementById("waiting").innerHTML = "對手已離開，請重新匹配。";
-    joinBtn.innerHTML = "加入遊戲";
+    joinBtn.innerHTML = "開始匹配";
     joinBtn.removeEventListener("click", cancelMatch);
     joinBtn.addEventListener("click", joinGame);
   });
@@ -62,7 +62,7 @@ function joinGame() {
 
     // 重置按鈕狀態
     const joinBtn = document.getElementById("join-btn");
-    joinBtn.innerHTML = "加入遊戲";
+    joinBtn.innerHTML = "開始匹配";
     joinBtn.removeEventListener("click", cancelMatch);
     joinBtn.addEventListener("click", joinGame);
 

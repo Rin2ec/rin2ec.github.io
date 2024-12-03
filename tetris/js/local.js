@@ -109,9 +109,11 @@ let bindKeyEvent = function () {
             if (line) {
                 game.addScore(line);
                 socket.emit("line", line);
-                if(line > 1) {
+                if(line >= 1) {
                     let bottomLines = generateBottomLine(line);
                     socket.emit("bottomLines", bottomLines);
+                    //console.log('socket.emit("bottomLines", bottomLines);');
+                    //console.log(bottomLines);
                 }
             }
             // 检查游戏是否结束
@@ -160,13 +162,16 @@ let bindKeyEvent = function () {
         for (let i = 0; i < lineNum; i++) {
             let line = [];
             for (let j = 0; j < 10; j++) {
-                line.push(Math.ceil(Math.random() * 2) - 1)
+                //line.push(Math.ceil(Math.random() * 2) - 1)
+                line.push(1); // 將每一格都設定為1，生成一整行的方塊
             }
             lines.push(line);
         }
         return lines;
 
     }
+
+
 
     // 计时函数
     let timeFunc = function () {
