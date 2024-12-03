@@ -5,58 +5,348 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Tetris</title>
+    <title>Tetris Battle beta</title>
+<style>
+/* 一般樣式設置 */
+body {
+    margin: 0;
+    font-family: '微軟正黑體', sans-serif;
+    color: white;
+    background: linear-gradient(120deg, #0a0f1e, #1a2b45);
+}
 
-    <!-- import css files -->
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/style.css">
+header {
+    margin-top: 20px;
+    text-align: center;
+}
+
+header h2 {
+    font-weight: normal;
+    font-size: 36px;
+    color: #3fa9f5;
+    text-shadow: 0 4px 8px rgba(63, 169, 245, 0.5);
+}
+
+.container {
+    text-align: center;
+    margin-top: 5px;
+}
+
+.clearfix::before,
+.clearfix::after {
+    display: table;
+    content: "";
+    clear: both;
+}
+
+h3 {
+    text-align: center;
+    font-weight: normal;
+    font-size: 20px;
+    color: #8aa2b5;
+}
+
+.local,
+.remote {
+    margin: 20px 40px;
+    display: inline-block;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.local {
+    border-right: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.game {
+    width: 200px;
+    height: 400px;
+    background: #222831;
+    border: 2px solid #3fa9f5;
+    position: relative;
+    float: left;
+    margin: 10px auto;
+    border-radius: 8px;
+    box-shadow: 0 0 12px rgba(63, 169, 245, 0.8), inset 0 0 12px rgba(63, 169, 245, 0.3);
+}
+
+
+.score p {
+    font-size: 16px;
+    margin-left: 5px 0;
+    color: #3fa9f5;
+    text-shadow: 0 0 5px #00f0ff;
+    margin: 5px 0;
+}
+
+.next {
+    width: 80px;
+    height: 80px;
+    background: #4a5568;
+    border: 1px solid #3fa9f5;
+    border-radius: 4px;
+    box-shadow: inset 0 0 8px rgba(63, 169, 245, 0.5);
+    position: relative;
+}
+
+
+.control-buttons {
+    margin: 30px auto;
+    text-align: center;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: 80px 80px 80px;
+    grid-template-rows: 80px 80px;
+    grid-gap: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+#btn-rotate {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+#btn-left {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+#btn-down {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+#btn-right {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+#btn-fall {
+    grid-column: 2;
+    grid-row: 3;
+}
+
+
+.control-buttons button {
+    background-color: #3fa9f5;
+    color: white;
+    border: none;
+    padding: 15px;
+    font-size: 1em;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 12px rgba(63, 169, 245, 0.5), 0 0 10px rgba(63, 169, 245, 0.8);
+    width: 80px;
+    height: 80px;
+}
+
+.control-buttons button:hover {
+    background-color: #3492d1;
+    transform: translateY(-3px) scale(1.1);
+    box-shadow: 0 8px 16px rgba(52, 146, 209, 0.7), 0 0 20px #00d1ff;
+}
+
+.control-buttons button:active {
+    background-color: #2b7aac;
+    transform: translateY(1px);
+}
+
+.join-btn {
+    margin: 20px;
+    padding: 10px 20px;
+    font-size: 1.2em;
+    background-color: #3fa9f5;
+    color: white;
+    border: 2px solid #3492d1;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(63, 169, 245, 0.5), 0 0 15px rgba(63, 169, 245, 0.8);
+}
+
+.join-btn:hover {
+    background-color: #3492d1;
+    color: white;
+    transform: scale(1.05);
+}
+
+footer {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 12px;
+    color: #8aa2b5;
+}
+
+footer a {
+    color: #3fa9f5;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* 遊戲區塊樣式 */
+.none,
+.current,
+.done {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    box-sizing: border-box;
+}
+
+.none {
+    background: #4a5568;
+    border: 1px solid #576a86;
+    animation: none;
+}
+
+.current {
+    background: #3fa9f5;
+    border: 2px solid #9adaeb;
+    box-shadow: 0 0 10px #00f0ff;
+    animation: glow 0.5s infinite alternate;
+}
+
+.done {
+    background: #c9cdcf;
+    border: 1px solid #2b7aac;
+    animation: pulse 0.5s ease-in-out;
+}
+
+/* 方塊停止時的動畫效果 */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(99, 108, 114, 0.5);
+    }
+    50% {
+        transform: scale(1.2);
+        box-shadow: 0 0 20px rgba(99, 108, 114, 0.8);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(99, 108, 114, 0.5);
+    }
+}
+
+/* 方塊消除時的閃爍動畫效果 */
+.clear-animation {
+    animation: flash 0.5s ease-in-out;
+}
+
+@keyframes flash {
+    0%, 100% {
+        background: #ff6347;
+        box-shadow: 0 0 15px #ff6347;
+    }
+    50% {
+        background: #ffe47a;
+        box-shadow: 0 0 30px #ffe47a;
+    }
+}
+
+/* 讓方塊滑動更順暢的過渡效果 */
+.moving {
+    transition: all 0.3s ease-in-out;
+}
+
+/* 遊戲結束樣式 */
+#result {
+    font-size: 2em;
+    color: #d32f2f;
+    text-align: center;
+    animation: bounceIn 0.5s ease;
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 1;
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* 增加高科技感的方塊光暈效果 */
+@keyframes glow {
+    from {
+        box-shadow: 0 0 2px #00f0ff;
+    }
+    to {
+        box-shadow: 0 0 5px #00f0ff;
+    }
+}
+
+/* 確保所有內容都在可見範圍內，避免內容溢出 */
+
+.game {
+    margin-bottom: 20px;
+}
+
+.info {
+    width: 150px;
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.next {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.score {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+    margin-top: 10px;
+}
+
+
+
+</style>
 
 </head>
 
 <body>
     <header>
-        <h2>Tetris</h2>
-        <!-- 遊戲說明區塊 
-        <button class="btn view-btn" data-toggle="modal" data-target="#myModal">
-            <span class="view">遊戲說明</span>
-        </button>
-        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <strong>遊戲介紹</strong>
-                    </div>
-                    <div class="modal-body introduce">
-                        <p>遊戲為回合對戰，當一個玩家進入後自動進入等待狀態，另一個玩家進入則自動開始遊戲；</p>
-                        <p>基本操作： ↑：旋轉、←：左移、→：右移、空格：快速下墜； </p>
-                        <p>提示：必須在至少有相應進入遊戲介面才可以開始，如果您只想瀏覽效果，則可以將url位址複製到新的頁面即可設定成功。
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-         -->
+        <h2>Tetris Battle Beta</h2>
     </header>
 
-
     <div class="container">
-        <button id="join-btn" class="join-btn">加入遊戲</button>
+        <button id="join-btn" class="join-btn">開始匹配</button>
         <div id="waiting"></div>
-        <!-- 游戏区域 -->
+
         <div class="local clearfix">
             <h3>P1</h3>
             <div class="game" id="local_game"></div>
             <div class="info">
-                <!-- 下一个方块 -->
                 <div class="next" id="local_next"></div>
-                <!-- 游戏信息 -->
                 <div class="score">
-                    <p>時間：
-                        <span id="local_time">0</span>秒</p>
-                    <p>分數：
-                        <span id="local_score">0</span>分</p>
+                    <p>時間：<span id="local_time">0</span>秒</p>
+                    <p>分數：<span id="local_score">0</span>分</p>
                     <div id="local_gameover"></div>
                 </div>
             </div>
@@ -66,36 +356,30 @@
             <h3>P2</h3>
             <div class="game" id="remote_game"></div>
             <div class="info">
-                <!-- 下一个方块 -->
                 <div class="next" id="remote_next"></div>
-                <!-- 游戏信息 -->
                 <div class="score">
-                    <p>時間：
-                        <span id="remote_time">0</span>秒</p>
-                    <p>分數：
-                        <span id="remote_score">0</span>分</p>
+                    <p>時間：<span id="remote_time">0</span>秒</p>
+                    <p>分數：<span id="remote_score">0</span>分</p>
                     <div id="remote_gameover"></div>
-
-
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 控制按鈕區域 -->
     <div class="control-buttons">
-        <button id="btn-left">左移(←)</button>
-        <button id="btn-rotate">旋轉</button>
-        <button id="btn-right">右移(→)</button>
-        <button id="btn-down">下移(↓)</button>
-        <button id="btn-fall">快速下墜</button>
+        <div class="grid-container">
+            <button id="btn-rotate">旋轉(W)</button>
+            <button id="btn-left">左移(A)</button>
+            <button id="btn-down">下移(S)</button>
+            <button id="btn-right">右移(D)</button>
+            <button id="btn-fall">(SPACE)</button>
+        </div>
     </div>
 
     <footer>
-        <p>test &copy; 2024.12.02</p>
-        <p>twitch： <a href="http:\\...">http:\\...</a></p>
+        <p>Rin2ec &copy; 2024.12.02</p>
+        <p>Twitch：<a href="http://...">http://...</a></p>
     </footer>
-
     <script src="js/socket.io.js"></script>
     <script src="js/square.js"></script>
     <script src="js/squareFactory.js"></script>
@@ -105,7 +389,6 @@
     <script src="js/script.js"></script>
     <script src="js/jquery-3.2.1.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
-
 </body>
 
 </html>
