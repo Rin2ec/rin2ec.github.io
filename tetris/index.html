@@ -331,6 +331,39 @@ footer a:hover {
 }
 
 
+.hold-area {
+    width: 80px;
+    height: 80px;
+    margin: 10px 0;
+    border: 2px solid #3fa9f5;
+    border-radius: 8px;
+    background: #2d3748; /* 深色背景讓儲存方塊更加明顯 */
+    display: flex;
+    flex-wrap: wrap;  /* 使用 flex 容器以自動排列內部方塊 */
+    align-items: flex-start;  /* 從頂部開始排列方塊 */
+    justify-content: flex-start; /* 從左到右排列 */
+    box-shadow: 0 0 8px rgba(63, 169, 245, 0.5);
+    position: relative; /* 確保子元素相對於此容器 */
+}
+
+.hold-area .hold-block {
+    width: 20px;
+    height: 20px;
+    margin: 2px;  /* 小的間距來清晰地顯示每個方塊 */
+    box-sizing: border-box;
+}
+
+.hold-area .hold-block.none {
+    background: #4a5568;
+    border: 1px solid #576a86;
+}
+
+.hold-area .hold-block.done {
+    background: #3fa9f5;
+    border: 1px solid #2b7aac;
+    box-shadow: 0 0 5px #00f0ff;
+}
+
 </style>
 
 </head>
@@ -349,6 +382,7 @@ footer a:hover {
             <div class="game" id="local_game"></div>
             <div class="info">
                 <div class="next" id="local_next"></div>
+                <div id="local_hold" class="hold-area"></div> <!-- Local 的 hold area -->
                 <div class="score">
                     <p>時間：<span id="local_time">0</span>秒</p>
                     <p>分數：<span id="local_score">0</span>分</p>
@@ -362,6 +396,7 @@ footer a:hover {
             <div class="game" id="remote_game"></div>
             <div class="info">
                 <div class="next" id="remote_next"></div>
+                <div id="remote_hold" class="hold-area"></div> <!-- Remote 的 hold area -->
                 <div class="score">
                     <p>時間：<span id="remote_time">0</span>秒</p>
                     <p>分數：<span id="remote_score">0</span>分</p>
@@ -382,7 +417,7 @@ footer a:hover {
     </div>
 
     <footer>
-        <p>Rin2ec &copy; 2024.12.02</p>
+        <p>Rin2ec &copy; 2024.12.09</p>
         <p>Twitch：<a href="http://...">http://...</a></p>
     </footer>
     <script src="js/socket.io.js"></script>
