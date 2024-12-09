@@ -297,6 +297,132 @@ let Game = function () {
         refreshDiv(gameData, gameDivs);
     };
 
+
+
+
+
+
+let hold = null;
+
+// 更新 hold 方塊的渲染邏輯
+let refreshHold = function (holdBlock) {
+    let holdDiv = document.getElementById('local_hold');
+    holdDiv.innerHTML = ''; // 清空
+    if (holdBlock) {
+        for (let i = 0; i < holdBlock.data.length; i++) {
+            for (let j = 0; j < holdBlock.data[0].length; j++) {
+                let newNode = document.createElement('div');
+                newNode.className = holdBlock.data[i][j] !== 0 ? 'done' : 'none';
+                newNode.style.top = `${i * 20}px`;
+                newNode.style.left = `${j * 20}px`;
+                holdDiv.appendChild(newNode);
+            }
+        }
+    }
+};
+
+// 更新 hold 方塊的渲染邏輯
+let refreshHold_remote = function (holdBlock) {
+    console.log("[refreshHold_remote] holdBlock:", holdBlock);
+    let holdDiv = document.getElementById('remote_hold');
+    holdDiv.innerHTML = ''; // 清空
+    if (holdBlock) {
+        for (let i = 0; i < holdBlock.data.length; i++) {
+            for (let j = 0; j < holdBlock.data[0].length; j++) {
+                let newNode = document.createElement('div');
+                newNode.className = holdBlock.data[i][j] !== 0 ? 'done' : 'none';
+                newNode.style.top = `${i * 20}px`;
+                newNode.style.left = `${j * 20}px`;
+                holdDiv.appendChild(newNode);
+            }
+        }
+    }
+};
+
+let swapHold = function () {
+    // 清空當前方塊數據
+    clearData();
+    let type = Math.ceil(Math.random() * 7) - 1;
+    let dir = Math.ceil(Math.random() * 4) - 1;
+    if (!hold) {
+        // 如果 hold 為空，將當前方塊儲存，並切換到下一個方塊
+        hold = cur;
+        cur = next;
+        next = SquareFactory.prototype.make(type, dir);
+    } else {
+        // 如果 hold 不為空，交換 hold 和當前方塊
+        [hold, cur] = [cur, hold];
+        // 重置當前方塊的位置到初始值
+        cur.origin = { x: 0, y: 3};
+    }
+    // 更新 UI 和資料
+    refreshHold(hold);
+    setData();
+    refreshDiv(gameData, gameDivs);
+    
+    socket.emit("holdSwap", {
+        hold: {
+            data: hold.data,
+            origin: hold.origin,
+            dir: hold.dir,
+            rotates: hold.rotates,
+            name: hold.name  // 傳遞名稱
+        },
+        cur: {
+            data: cur.data,
+            origin: cur.origin,
+            dir: cur.dir,
+            rotates: cur.rotates,
+            name: cur.name  // 傳遞名稱
+        },
+        next: {
+            data: next.data,
+            origin: next.origin,
+            dir: next.dir,
+            rotates: next.rotates,
+            name: next.name  // 傳遞名稱
+        }
+    });
+    console.log("[Local from game.js swapHold] Updated hold, cur, and next data sent to remote:", {
+    hold: hold,
+    cur: cur,
+    next: next
+});
+
+
+};
+
+
+let swapHoldRemote = function (data) {
+    console.log("[Remote]接收到 swapHoldRemote:", data);
+    // 清空當前方塊數據
+    clearData();
+    let type = Math.ceil(Math.random() * 7) - 1;
+    let dir = Math.ceil(Math.random() * 4) - 1;
+    if (!hold) {
+        // 如果 hold 為空，將當前方塊儲存，並切換到下一個方塊
+        hold = cur;
+        cur = next;
+        next = SquareFactory.prototype.make(type, dir);
+    } else {
+        // 如果 hold 不為空，交換 hold 和當前方塊
+        [hold, cur] = [cur, hold];
+        // 重置當前方塊的位置到初始值
+        cur.origin = { x: 0, y: 3};
+    }
+    // 更新 UI 和資料
+    refreshHold(hold);
+    setData();
+    refreshDiv(gameData, gameDivs);
+};
+
+
+
+    this.getHoldData = function () {
+        return hold ? { type: hold.type, data: hold.data } : null;
+    };
+
+
     // 导出API
     this.init = init;
     this.down = down;
@@ -314,4 +440,13 @@ let Game = function () {
     this.addScore = addScore;
     this.showGameover = showGameover;
     this.addTailLines = addTailLines;
+
+
+    //待修正
+    this.refreshHold = refreshHold;
+    this.refreshHold_remote = refreshHold_remote;
+    this.swapHold = swapHold;
+    this.getHoldData = this.getHoldData;
+    this.swapHoldRemote = swapHoldRemote;
+
 }

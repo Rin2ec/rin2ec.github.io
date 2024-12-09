@@ -27,9 +27,11 @@ let Remote = function (socket) {
         });
         socket.on("down", function(){
             game.down();
+            //console.log("[Remote] down data received:");
         });
         socket.on("left", function(){
             game.left();
+            console.log("[Remote] left data received:");
         });
         socket.on("right", function(){
             game.right();
@@ -53,7 +55,64 @@ let Remote = function (socket) {
         socket.on("addTailLines", function(data){
             game.addTailLines(data);
         });
-      
+
+
+socket.on('holdSwap', function (data) {
+    //console.log("[Remote.js socket.on('holdSwap')] data:", JSON.stringify(data, null, 2));
+
+    function recreateSquare(data) {
+        switch (data.name) {
+            case 'Square1':
+                return new Square1();
+            case 'Square2':
+                return new Square2();
+            case 'Square3':
+                return new Square3();
+            case 'Square4':
+                return new Square4();
+            case 'Square5':
+                return new Square5();
+            case 'Square6':
+                return new Square6();
+            case 'Square7':
+                return new Square7();
+            default:
+                console.error("Unknown square type:", data.name);
+                return null;
+        }
+    }
+
+    hold = recreateSquare(data.hold);
+    if (hold) {
+        hold.origin = data.hold.origin;
+        hold.dir = data.hold.dir;
+        hold.rotates = data.hold.rotates;
+    }
+
+    cur = recreateSquare(data.cur);
+    if (cur) {
+        cur.origin = data.cur.origin;
+        cur.dir = data.cur.dir;
+        cur.rotates = data.cur.rotates;
+    }
+
+    next = recreateSquare(data.next);
+    if (next) {
+        next.origin = data.next.origin;
+        next.dir = data.next.dir;
+        next.rotates = data.next.rotates;
+    }
+
+    console.log("[Remote.js socket.on('holdSwap')] { hold, cur, next }", { hold, cur, next });
+    game.swapHoldRemote({ hold, cur, next });
+    hold = data.hold;
+    game.refreshHold_remote(hold);
+});
+
+
+
+
+
 
     };
 

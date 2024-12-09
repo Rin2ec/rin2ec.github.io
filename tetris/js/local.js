@@ -38,6 +38,9 @@ let bindKeyEvent = function () {
                 game.fall();
                 socket.emit("fall");
                 break;
+            case 16: // Shift key
+                game.swapHold(); // 執行儲存與切換邏輯
+                break;
         }
     };
 };
@@ -204,4 +207,6 @@ let bindKeyEvent = function () {
         game.addTailLines(data);
         socket.emit("addTailLines", data);
      });
+
+
 }

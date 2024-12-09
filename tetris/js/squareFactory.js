@@ -1,6 +1,7 @@
 let Square1 = function () {
     Square.call(this);
     // 定义旋转数组
+    this.name = 'Square1';  // 添加類型標識符
     this.rotates = [
         [
             [0, 2, 0, 0],
@@ -32,6 +33,7 @@ Square1.prototype = Square.prototype;
 
 let Square2 = function () {
     Square.call(this);
+    this.name = 'Square2';  // 添加類型標識符
     // 定义旋转数组
     this.rotates = [
         [
@@ -65,6 +67,7 @@ Square2.prototype = Square.prototype;
 
 let Square3 = function () {
     Square.call(this);
+    this.name = 'Square3';  // 添加類型標識符
     // 定义旋转数组
     this.rotates = [
         [
@@ -97,6 +100,7 @@ Square3.prototype = Square.prototype;
 
 let Square4 = function () {
     Square.call(this);
+    this.name = 'Square4';  // 添加類型標識符
     // 定义旋转数组
     this.rotates = [
         [
@@ -129,6 +133,7 @@ Square4.prototype = Square.prototype;
 
 let Square5 = function () {
     Square.call(this);
+    this.name = 'Square5';  // 添加類型標識符
     // 定义旋转数组
     this.rotates = [
         [
@@ -161,6 +166,7 @@ Square5.prototype = Square.prototype;
 
 let Square6 = function () {
     Square.call(this);
+    this.name = 'Square6';  // 添加類型標識符
     // 定义旋转数组
     this.rotates = [
         [
@@ -193,6 +199,7 @@ Square6.prototype = Square.prototype;
 
 let Square7 = function () {
     Square.call(this);
+    this.name = 'Square7';  // 添加類型標識符
     // 定义旋转数组
     this.rotates = [
         [
@@ -258,3 +265,5 @@ SquareFactory.prototype.make = function (index, dir) {
     square.rotate(dir);
     return square;
 };
+
+
