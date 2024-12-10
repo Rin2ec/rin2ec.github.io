@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>TBeta</title>
+<style>
+/* 一般樣式設置 */
+body {
+    margin: 0;
+    font-family: '微軟正黑體', sans-serif;
+    color: white;
+    background: linear-gradient(120deg, #0a0f1e, #1a2b45);
+}
+
+header {
+    margin-top: 20px;
+    text-align: center;
+}
+
+header h2 {
+    font-weight: normal;
+    font-size: 24px;
+    color: #3fa9f5;
+    text-shadow: 0 4px 8px rgba(63, 169, 245, 0.5);
+}
+
+.container {
+    text-align: center;
+    margin-top: 5px;
+}
+
+.clearfix::before,
+.clearfix::after {
+    display: table;
+    content: "";
+    clear: both;
+}
+
+h3 {
+    text-align: center;
+    font-weight: normal;
+    font-size: 20px;
+    color: #8aa2b5;
+}
+
+.local,
+.remote {
+    margin: 20px 40px;
+    display: inline-block;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.local {
+    border-right: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.game {
+    width: 200px;
+    height: 400px;
+    background: #222831;
+    border: 2px solid #3fa9f5;
+    position: relative;
+    float: left;
+    margin: 10px auto;
+    border-radius: 8px;
+    box-shadow: 0 0 12px rgba(63, 169, 245, 0.8), inset 0 0 12px rgba(63, 169, 245, 0.3);
+}
+
+
+.score p {
+    font-size: 16px;
+    margin-left: 5px 0;
+    color: #3fa9f5;
+    text-shadow: 0 0 5px #00f0ff;
+    margin: 5px 0;
+}
+
+.next {
+    width: 80px;
+    height: 80px;
+    background: #4a5568;
+    border: 1px solid #3fa9f5;
+    border-radius: 4px;
+    box-shadow: inset 0 0 8px rgba(63, 169, 245, 0.5);
+    position: relative;
+}
+
+
+.control-buttons {
+    margin: 30px auto;
+    text-align: center;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: 80px 80px 80px;
+    grid-template-rows: 80px 80px;
+    grid-gap: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+#btn-rotate {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+#btn-left {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+#btn-down {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+#btn-right {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+#btn-fall {
+    grid-column: 3;
+    grid-row: 1;
+}
+
+#btn-holdswap {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.control-buttons button {
+    display: flex; /* 使按鈕內容成為彈性盒子 */
+    align-items: center; /* 垂直居中 */
+    justify-content: center; /* 水平居中 */
+    background-color: #3fa9f5;
+    color: white;
+    border: none;
+    padding: 15px;
+    font-size: 15px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 12px rgba(63, 169, 245, 0.5), 0 0 10px rgba(63, 169, 245, 0.8);
+    width: 80px;
+    height: 80px;
+}
+
+.control-buttons button:hover {
+    background-color: #3492d1;
+    transform: translateY(-3px) scale(1.1);
+    box-shadow: 0 8px 16px rgba(52, 146, 209, 0.7), 0 0 20px #00d1ff;
+}
+
+.control-buttons button:active {
+    background-color: #2b7aac;
+    transform: translateY(1px);
+}
+
+.join-btn {
+    margin: 20px;
+    padding: 10px 20px;
+    font-size: 1.2em;
+    background-color: #3fa9f5;
+    color: white;
+    border: 2px solid #3492d1;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(63, 169, 245, 0.5), 0 0 15px rgba(63, 169, 245, 0.8);
+}
+
+  #join-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+        gap: 8px; /* 控制 loader 與文字間距 */
+  }
+
+.join-btn:hover {
+    background-color: #3492d1;
+    color: white;
+    transform: scale(1.05);
+}
+
+footer {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 12px;
+    color: #8aa2b5;
+}
+
+footer a {
+    color: #3fa9f5;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* 遊戲區塊樣式 */
+.none,
+.current,
+.done {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    box-sizing: border-box;
+}
+
+.none {
+    background: #4a5568;
+    border: 1px solid #576a86;
+    animation: none;
+}
+
+.current {
+    background: #3fa9f5;
+    border: 2px solid #9adaeb;
+    box-shadow: 0 0 10px #00f0ff;
+    animation: glow 0.5s infinite alternate;
+}
+
+.done {
+    background: #c9cdcf;
+    border: 1px solid #2b7aac;
+    animation: pulse 0.5s ease-in-out;
+}
+
+/* 方塊停止時的動畫效果 */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(99, 108, 114, 0.5);
+    }
+    50% {
+        transform: scale(1.2);
+        box-shadow: 0 0 20px rgba(99, 108, 114, 0.8);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(99, 108, 114, 0.5);
+    }
+}
+
+/* 方塊消除時的閃爍動畫效果 */
+.clear-animation {
+    animation: flash 0.5s ease-in-out;
+}
+
+@keyframes flash {
+    0%, 100% {
+        background: #ff6347;
+        box-shadow: 0 0 15px #ff6347;
+    }
+    50% {
+        background: #ffe47a;
+        box-shadow: 0 0 30px #ffe47a;
+    }
+}
+
+/* 讓方塊滑動更順暢的過渡效果 */
+.moving {
+    transition: all 0.3s ease-in-out;
+}
+
+/* 遊戲結束樣式 */
+#result {
+    font-size: 2em;
+    color: #d32f2f;
+    text-align: center;
+    animation: bounceIn 0.5s ease;
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 1;
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* 增加高科技感的方塊光暈效果 */
+@keyframes glow {
+    from {
+        box-shadow: 0 0 2px #00f0ff;
+    }
+    to {
+        box-shadow: 0 0 5px #00f0ff;
+    }
+}
+
+/* 確保所有內容都在可見範圍內，避免內容溢出 */
+
+.game {
+    margin-bottom: 20px;
+}
+
+.info {
+    width: 150px;
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.next {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.score {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+    margin-top: 10px;
+}
+
+/* 新增樣式來標記干擾行的樣式 */
+.interference {
+    background-color: #ff6347;
+    border: 1px solid #ff4500;
+}
+
+
+.hold-area {
+    width: 80px;
+    height: 80px;
+    margin: 10px 0;
+    border: 2px solid #3fa9f5;
+    border-radius: 8px;
+    background: #2d3748; /* 深色背景讓儲存方塊更加明顯 */
+    display: flex;
+    flex-wrap: wrap;  /* 使用 flex 容器以自動排列內部方塊 */
+    align-items: flex-start;  /* 從頂部開始排列方塊 */
+    justify-content: flex-start; /* 從左到右排列 */
+    box-shadow: 0 0 8px rgba(63, 169, 245, 0.5);
+    position: relative; /* 確保子元素相對於此容器 */
+}
+
+.hold-area .hold-block {
+    width: 20px;
+    height: 20px;
+    margin: 2px;  /* 小的間距來清晰地顯示每個方塊 */
+    box-sizing: border-box;
+}
+
+.hold-area .hold-block.none {
+    background: #4a5568;
+    border: 1px solid #576a86;
+}
+
+.hold-area .hold-block.done {
+    background: #3fa9f5;
+    border: 1px solid #2b7aac;
+    box-shadow: 0 0 5px #00f0ff;
+}
+
+.ghost {
+    background: rgba(115, 208, 255, 0.6); /* 半透明顏色 */
+    border: 1px outset rgba(144, 222, 255, 0.8); /* 虛線框 */
+}
+
+
+
+
+.cancel-btn {
+    margin: 20px;
+    padding: 10px 20px;
+    font-size: 1.2em;
+    background-color: #f54242; /* 紅色背景 */
+    color: white;
+    border: 2px solid #d13737; /* 紅色邊框 */
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(245, 66, 66, 0.5), 0 0 15px rgba(245, 66, 66, 0.8);
+}
+
+.cancel-btn:hover {
+    background-color: #d13737; /* 深紅色背景 */
+    color: white;
+    transform: scale(1.05);
+}
+
+
+
+
+
+
+ .loader {
+    border: 4px solid #f3f3f3; /* Light grey */
+    border-top: 4px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: button-loading-spinner 1s ease infinite;
+  }
+
+  @keyframes button-loading-spinner {
+    from {
+      transform: rotate(0turn);
+    }
+    to {
+      transform: rotate(1turn);
+    }
+  }
+
+  .btn-text {
+    display: inline-block;
+  }
+
+
+
+
+</style>
+
+</head>
+
+<body>
+    <header>
+        <h2>Tetris Battle Beta</h2>
+    </header>
+
+    <div class="container">
+        <button id="join-btn" class="join-btn">開始匹配</button>
+        <div id="waiting"></div>
+
+        <div class="local clearfix">
+            <h3>P1</h3>
+            <div class="game" id="local_game"></div>
+            <div class="info">
+                <div class="next" id="local_next"></div>
+                <div id="local_hold" class="hold-area"></div> <!-- Local 的 hold area -->
+                <div class="score">
+                    <p>時間：<span id="local_time">0</span>秒</p>
+                    <p>分數：<span id="local_score">0</span>分</p>
+                    <div id="local_gameover"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="remote clearfix">
+            <h3>P2</h3>
+            <div class="game" id="remote_game"></div>
+            <div class="info">
+                <div class="next" id="remote_next"></div>
+                <div id="remote_hold" class="hold-area"></div> <!-- Remote 的 hold area -->
+                <div class="score">
+                    <p>時間：<span id="remote_time">0</span>秒</p>
+                    <p>分數：<span id="remote_score">0</span>分</p>
+                    <div id="remote_gameover"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="control-buttons">
+        <div class="grid-container">
+            <button id="btn-rotate">旋轉(W)</button>
+            <button id="btn-left">左移(A)</button>
+            <button id="btn-down">下移(S)</button>
+            <button id="btn-right">右移(D)</button>
+            <button id="btn-fall">降落(SPACE)</button>
+            <button id="btn-swaphold">交換(Shift)</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>Rin2ec &copy; 2024.12.10</p>
+        <p>Twitch：<a href="http://...">http://...</a></p>
+    </footer>
+    <script src="js/socket.io.js"></script>
+    <script src="js/square.js"></script>
+    <script src="js/squareFactory.js"></script>
+    <script src="js/local.js"></script>
+    <script src="js/remote.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+</body>
+
+</html>
