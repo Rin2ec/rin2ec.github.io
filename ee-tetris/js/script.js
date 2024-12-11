@@ -193,7 +193,15 @@ function generateRandomDir() {
 }
 
 function bindPracticeKeyEvents(game) {
+    let isKeyEnabled = true; // 按鍵操作標誌
+
     document.onkeydown = function (e) {
+        if (!isKeyEnabled) {
+            // 禁用按鍵期間直接返回
+            e.preventDefault();
+            return;
+        }
+
         switch (e.keyCode) {
             case 37: // 左箭頭
             case 65: // 'A'
@@ -218,6 +226,12 @@ function bindPracticeKeyEvents(game) {
             case 32: // 空格鍵（快速下降）
                 e.preventDefault();
                 game.fall();
+
+                // 禁用按鍵 0.5 秒
+                isKeyEnabled = false;
+                setTimeout(() => {
+                    isKeyEnabled = true; // 恢復按鍵功能
+                }, 500);
                 break;
             case 16: // Shift鍵（保存/交換）
                 e.preventDefault();
