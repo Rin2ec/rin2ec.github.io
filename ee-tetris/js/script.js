@@ -28,9 +28,12 @@ function handleUsername() {
 function joinGame() {
 
     const username = handleUsername();
+    console.log('usename',username);
     if (username) {
         document.getElementById("waiting").innerHTML = `🎮 歡迎，${username}！開始匹配...`;
         // 進一步的邏輯，例如連接伺服器等
+    }else{
+      return false;
     }
 
 
