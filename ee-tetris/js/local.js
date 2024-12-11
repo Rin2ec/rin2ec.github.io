@@ -10,42 +10,57 @@ let Local = function (socket) {
     // 时间
     let time = 0;
 
+// 是否允許按鍵操作的標誌
+let isKeyEnabled = true;
+
 // 绑定键盘事件
 let bindKeyEvent = function () {
     document.onkeydown = function (e) {
+        if (!isKeyEnabled) {
+            // 如果按鍵禁用中，直接返回
+            e.preventDefault(); // 可選：防止誤觸時有其他行為
+            return;
+        }
+
         switch (e.keyCode) {
             case 37: // left arrow
             case 65: // 'A'
-                e.preventDefault(); // 阻止預設行為
+                e.preventDefault();
                 game.left();
                 socket.emit("left");
                 break;
             case 38: // up arrow
             case 87: // 'W'
-                e.preventDefault(); // 阻止預設行為
+                e.preventDefault();
                 game.rotate();
                 socket.emit("rotate");
                 break;
             case 39: // right arrow
             case 68: // 'D'
-                e.preventDefault(); // 阻止預設行為
+                e.preventDefault();
                 game.right();
                 socket.emit("right");
                 break;
             case 40: // down arrow
             case 83: // 'S'
-                e.preventDefault(); // 阻止預設行為
+                e.preventDefault();
                 game.down();
                 socket.emit("down");
                 break;
-            case 32: // space
-                e.preventDefault(); // 阻止預設行為
+            case 32: // space (fall)
+                e.preventDefault();
                 game.fall();
                 socket.emit("fall");
+
+                // 禁用按鍵 0.5 秒
+                isKeyEnabled = false;
+                setTimeout(() => {
+                    isKeyEnabled = true; // 恢復按鍵功能
+                }, 500);
                 break;
             case 16: // Shift key
-                e.preventDefault(); // 阻止預設行為
-                game.swapHold(); // 執行儲存與切換邏輯
+                e.preventDefault();
+                game.swapHold();
                 break;
         }
     };
@@ -131,9 +146,8 @@ let bindKeyEvent = function () {
             // 检查游戏是否结束
             let gameOver = game.checkGameOver();
             if (gameOver) {
-                // 结束游戏
+                // 結束遊戲
                 game.showGameover(false);
-                document.getElementById("remote_gameover").innerHTML = "✨勝利!";
                 socket.emit("lose");
                 stop();
             } else {
@@ -158,6 +172,26 @@ let bindKeyEvent = function () {
             timer = null;
         }
         document.onkeydown = null;
+
+        //新增內容
+        
+       // 中斷連線
+        if (socket) {
+            socket.disconnect();
+            console.log("WebSocket 已斷開");
+        }
+
+        
+        // 重置匹配按鈕
+        const joinBtn = document.getElementById("join-btn");
+        joinBtn.innerHTML = "開始匹配";
+        document.getElementById("waiting").innerHTML = "📍遊戲結束，請重新匹配";
+        joinBtn.disabled = false;
+        joinBtn.removeEventListener("click", cancelMatch);
+        joinBtn.addEventListener("click", joinGame);
+        updateButtonStyle(joinBtn, false); // 設為藍色背景
+        
+
     };
     // 生成一个随机方块种类
     let generateType = function () {
@@ -205,13 +239,14 @@ let bindKeyEvent = function () {
     });
 
     socket.on("lose", function(){
-        game.showGameover(true);
+        game.showGameover(false);
         stop();
     });
 
     socket.on("leave", function () { 
-        document.getElementById("local_gameover").innerHTML = "⛓️‍💥已斷線";
-        document.getElementById("remote_gameover").innerHTML = "⛓️‍💥已斷線";
+        //document.getElementById("local_gameover").innerHTML = "⛓️‍💥已斷線";
+        game.showGameover(true);
+        //document.getElementById("remote_gameover").innerHTML = "⛓️‍💥已斷線";
         stop();
      });
 

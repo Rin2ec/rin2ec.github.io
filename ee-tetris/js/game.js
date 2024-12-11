@@ -274,9 +274,13 @@ let Game = function () {
     // 游戏结束
     let showGameover = function(win){
         if(win) {
-            resultDiv.innerHTML = "✨勝利";
+            //resultDiv.innerHTML = "✨勝利";
+            document.getElementById("local_gameover").innerHTML = "✨勝利";
+            document.getElementById("remote_gameover").innerHTML = "😭失敗";
         } else {
-            resultDiv.innerHTML = "😭失敗";
+            //resultDiv.innerHTML = "😭失敗";
+            document.getElementById("local_gameover").innerHTML = "😭失敗";
+            document.getElementById("remote_gameover").innerHTML = "✨勝利";
         }
     }
 

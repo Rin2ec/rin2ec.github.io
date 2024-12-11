@@ -16,7 +16,7 @@ body {
 }
 
 header {
-    margin-top: 20px;
+    margin-top: 5px;
     text-align: center;
 }
 
@@ -43,12 +43,13 @@ h3 {
     text-align: center;
     font-weight: normal;
     font-size: 20px;
-    color: #8aa2b5;
+    color: white;
+    /*color: #8aa2b5;*/
 }
 
 .local,
 .remote {
-    margin: 20px 40px;
+    margin: 10px 20px;
     display: inline-block;
     border-radius: 12px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
@@ -92,6 +93,7 @@ h3 {
 
 
 .control-buttons {
+    display: none; /* 預設隱藏 */
     margin: 30px auto;
     text-align: center;
 }
@@ -434,6 +436,105 @@ footer a:hover {
 
 
 
+.control-description {
+    position: relative;
+    top: -420px; /* 距離頂部 */
+    left: -550px; /* 距離左側 */
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    max-width: 180px; /* 限制寬度 */
+    margin: 30px auto;
+    text-align: center;
+}
+
+.control-description p {
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.control-description ul {
+    list-style-type: disc;
+    margin: 0;
+    padding-left: 20px; /* 清單縮排 */
+    text-align: left; /* 對齊文字 */
+}
+
+.control-description li {
+    margin-bottom: 8px;
+}
+
+
+/* 為快捷鍵文字添加按鍵樣式 */
+.control-description strong {
+    display: inline-block; /* 使其成為區塊元素，便於加邊框 */
+    padding: 5px 10px;
+    margin: 2px;
+    background-color: #888888; /* 背景色設為灰色 */
+    color: white; /* 字體顏色為白色 */
+    border: 2px solid #666666; /* 邊框顏色為深灰色 */
+    border-radius: 4px; /* 邊角圓滑 */
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 輕微的陰影效果 */
+    transition: all 0.2s ease; /* 過渡效果 */
+}
+
+/* 鼠標懸停時的效果 */
+.control-description strong:hover {
+    background-color: #666666; /* 當鼠標懸停時改變為較深的灰色 */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* 增加陰影 */
+    transform: translateY(-2px); /* 增加輕微的浮動效果 */
+}
+
+/* 點擊按鈕時的效果 */
+.control-description strong:active {
+    background-color: #444444; /* 當按下時變為更深的灰色 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(2px); /* 增加點擊效果 */
+}
+
+/* 帳號輸入框樣式 */
+#username-input {
+    width: 50%;
+    max-width: 150px;
+    padding: 10px 20px;
+    margin: 10px auto;
+    font-size: 16px;
+    color: #3fa9f5;
+    background: rgba(15, 32, 49, 0.8);
+    border: 2px solid #3fa9f5;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(63, 169, 245, 0.3);
+    outline: none;
+    transition: all 0.3s ease-in-out;
+}
+
+/* 當輸入框獲得焦點時的效果 */
+#username-input:focus {
+    background: rgba(63, 169, 245, 0.1);
+    border-color: #3492d1;
+    box-shadow: 0 6px 12px rgba(63, 169, 245, 0.5), 0 0 15px #00f0ff;
+}
+
+/* 占位符樣式 */
+#username-input::placeholder {
+    color: rgba(63, 169, 245, 0.5);
+    font-style: italic;
+    transition: color 0.3s ease-in-out;
+}
+
+#username-input:focus::placeholder {
+    color: rgba(63, 169, 245, 0.7);
+}
+
+
 
 </style>
 
@@ -445,9 +546,9 @@ footer a:hover {
     </header>
 
     <div class="container">
+        <input type="text" id="username-input" placeholder="請輸入帳號名稱" maxlength="20" />
         <button id="join-btn" class="join-btn">開始匹配</button>
         <div id="waiting"></div>
-
         <div class="local clearfix">
             <h3>P1</h3>
             <div class="game" id="local_game"></div>
@@ -476,6 +577,17 @@ footer a:hover {
             </div>
         </div>
     </div>
+    <div class="control-description">
+        <p>操作快捷鍵：</p>
+        <ul>
+            <li>旋轉方塊： <strong>W</strong></li>
+            <li>左移方塊： <strong>A</strong></li>
+            <li>下移方塊： <strong>S</strong></li>
+            <li>右移方塊： <strong>D</strong></li>
+            <li>降落方塊： <strong>空白鍵</strong></li>
+            <li>交換方塊： <strong>Shift</strong></li>
+        </ul>
+    </div>
 
     <div class="control-buttons">
         <div class="grid-container">
@@ -487,11 +599,12 @@ footer a:hover {
             <button id="btn-swaphold">交換(Shift)</button>
         </div>
     </div>
-
+<!--
     <footer>
         <p>Rin2ec &copy; 2024.12.10</p>
         <p>Twitch：<a href="http://...">http://...</a></p>
     </footer>
+-->
     <script src="js/socket.io.js"></script>
     <script src="js/square.js"></script>
     <script src="js/squareFactory.js"></script>
