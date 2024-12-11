@@ -1,16 +1,36 @@
 // 連接到 WebSocket 伺服器
 let socket;
 
-// 點擊加入按鈕後進行連線
-function joinGame() {
+// 頁面載入時自動填入帳號名稱
+document.addEventListener("DOMContentLoaded", function () {
+    const savedUsername = localStorage.getItem("ee-tetris-username"); // 使用特定鍵名
+    if (savedUsername) {
+        document.getElementById("username-input").value = savedUsername; // 自動填入已保存名稱
+    }
+});
 
+// 處理帳號名稱的邏輯
+function handleUsername() {
     const usernameInput = document.getElementById("username-input");
     const username = usernameInput.value.trim();
 
     if (!username) {
-        //alert("請先輸入帳號名稱！");
         document.getElementById("waiting").innerHTML = "❌請先輸入帳號名稱！";
-        return;
+        return false;
+    }
+
+    // 將帳號名稱存入瀏覽器的 localStorage
+    localStorage.setItem("ee-tetris-username", username);
+    return username; // 返回帳號名稱供其他邏輯使用
+}
+
+// 點擊加入按鈕後進行連線
+function joinGame() {
+
+    const username = handleUsername();
+    if (username) {
+        document.getElementById("waiting").innerHTML = `🎮 歡迎，${username}！開始匹配...`;
+        // 進一步的邏輯，例如連接伺服器等
     }
 
 
