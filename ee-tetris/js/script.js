@@ -116,3 +116,113 @@ function updateButtonStyle(joinBtn, isRed) {
 // 綁定加入遊戲按鈕的點擊事件
 document.getElementById("join-btn").addEventListener("click", joinGame);
 
+
+
+
+/*練習模式開始*/
+
+
+
+
+
+
+
+// 練習模式按鈕點擊事件
+document.getElementById("practice-btn").addEventListener("click", function () {
+    startPracticeMode();
+});
+
+// 啟動練習模式
+function startPracticeMode() {
+    document.getElementById("waiting").innerHTML = "🎮 練習模式開始！";
+
+    // 隱藏對手區域
+    document.querySelector(".remote").style.display = "none";
+
+    // 初始化本地遊戲
+    const doms = {
+        gameDiv: document.getElementById("local_game"),
+        nextDiv: document.getElementById("local_next"),
+        timeDiv: document.getElementById("local_time"),
+        scoreDiv: document.getElementById("local_score"),
+        resultDiv: document.getElementById("local_gameover"),
+    };
+
+    const localGame = new Game(); // 假設 Game 是現有遊戲邏輯類
+    const type = generateRandomType();
+    const dir = generateRandomDir();
+    localGame.init(doms, type, dir);
+
+    const nextType = generateRandomType();
+    const nextDir = generateRandomDir();
+    localGame.performNext(nextType, nextDir);
+
+    // 綁定鍵盤事件
+    bindPracticeKeyEvents(localGame);
+
+    // 開啟遊戲循環（類似 `Local` 的邏輯）
+    const interval = 500;
+    let timer = setInterval(function () {
+        if (!localGame.down()) {
+            localGame.fixed();
+            let lines = localGame.checkClear();
+            if (lines) {
+                localGame.addScore(lines);
+            }
+            if (localGame.checkGameOver()) {
+                clearInterval(timer);
+                localGame.showGameover(false);
+                document.getElementById("waiting").innerHTML = "💀 遊戲結束，請重新開始！";
+            } else {
+                const nextType = generateRandomType();
+                const nextDir = generateRandomDir();
+                localGame.performNext(nextType, nextDir);
+            }
+        }
+    }, interval);
+}
+
+
+// 隨機生成方塊類型和方向
+function generateRandomType() {
+    return Math.floor(Math.random() * 7);
+}
+
+function generateRandomDir() {
+    return Math.floor(Math.random() * 4);
+}
+
+function bindPracticeKeyEvents(game) {
+    document.onkeydown = function (e) {
+        switch (e.keyCode) {
+            case 37: // 左箭頭
+            case 65: // 'A'
+                e.preventDefault();
+                game.left();
+                break;
+            case 38: // 上箭頭
+            case 87: // 'W'
+                e.preventDefault();
+                game.rotate();
+                break;
+            case 39: // 右箭頭
+            case 68: // 'D'
+                e.preventDefault();
+                game.right();
+                break;
+            case 40: // 下箭頭
+            case 83: // 'S'
+                e.preventDefault();
+                game.down();
+                break;
+            case 32: // 空格鍵（快速下降）
+                e.preventDefault();
+                game.fall();
+                break;
+            case 16: // Shift鍵（保存/交換）
+                e.preventDefault();
+                game.swapHold();
+                break;
+        }
+    };
+}

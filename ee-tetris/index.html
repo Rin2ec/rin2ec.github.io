@@ -534,6 +534,23 @@ footer a:hover {
     color: rgba(63, 169, 245, 0.7);
 }
 
+.practice-btn {
+    margin: 1px;
+    padding: 10px 20px;
+    font-size: 1.2em;
+    background-color: #4caf50; /* 綠色背景 */
+    color: white;
+    border: 2px solid #3e8e41; /* 深綠色邊框 */
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.5), 0 0 15px rgba(76, 175, 80, 0.8);
+}
+
+.practice-btn:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
+}
 
 
 </style>
@@ -548,6 +565,7 @@ footer a:hover {
     <div class="container">
         <input type="text" id="username-input" placeholder="請輸入帳號名稱" maxlength="20" />
         <button id="join-btn" class="join-btn">開始匹配</button>
+        <button id="practice-btn" class="practice-btn">練習模式</button>
         <div id="waiting"></div>
         <div class="local clearfix">
             <h3>P1</h3>
