@@ -103,6 +103,12 @@
       return str.replace(/[\uFF10-\uFF19]/g, d => String.fromCharCode(d.charCodeAt(0) - 0xFF10 + 0x30));
     }
 
+    function updateBulkInputAndRender() {
+      numberList = [...new Set(numberList)].sort((a, b) => a - b);
+      bulkInput.value = numberList.join(', ');
+      renderResults();
+    }
+
     singleInput.addEventListener("keydown", function(e) {
       if (e.key === "Enter") {
         e.preventDefault();
@@ -115,12 +121,11 @@
         }
 
         if (numberList.includes(num)) {
-          notice.innerHTML = `<span class="duplicate">⚠️ ${num} 已經存在，請勿重複。</span>`;
+          notice.innerHTML = `<span class="duplicate">⚠️ ${num} 已經存在，請嘗試新頻道。</span>`;
         } else {
           numberList.push(num);
-          bulkInput.value += (bulkInput.value ? '\n' : '') + num;  // ✅ 同步加入 bulk 輸入框
           notice.innerHTML = `<span class="success">✅ 已加入 ${num}</span>`;
-          renderResults();
+          updateBulkInputAndRender();
         }
 
         singleInput.value = '';
@@ -136,11 +141,11 @@
         .filter(n => !isNaN(n));
 
       numberList = [...new Set(numbers)];
-      renderResults();
+      updateBulkInputAndRender();
     });
 
     function renderResults() {
-      const recent10 = numberList.slice(-10).reverse(); // 取最後 10 筆並反轉順序（最近輸入的放前面）
+      const recent10 = numberList.slice(-10).reverse(); // 取最後 10 筆並反轉順序（最近輸入的放前）
 
       const counts = {};
       numberList.forEach(n => counts[n] = (counts[n] || 0) + 1);
