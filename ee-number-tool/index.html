@@ -82,7 +82,7 @@
 <body>
   <h2>頻道紀錄小幫手</h2>
 
-  <p>快速單筆輸入（按 Enter 送出）：</p>
+  <p>快速單筆輸入（即時顯示狀態，Enter 送出）：</p>
   <input type="text" id="singleInput" placeholder="輸入一個數字按 Enter">
   <div class="notice" id="notice"></div>
 
@@ -109,6 +109,22 @@
       renderResults();
     }
 
+    singleInput.addEventListener("input", () => {
+      const raw = toHalfWidth(singleInput.value.trim());
+      const num = Number(raw);
+
+      if (raw === '' || isNaN(num)) {
+        notice.innerHTML = '';
+        return;
+      }
+
+      if (numberList.includes(num)) {
+        notice.innerHTML = `<span class="duplicate">⚠️ ${num} 已經存在，請嘗試新頻道。</span>`;
+      } else {
+        notice.innerHTML = `<span class="success">✔️ ${num} 有效</span>`;
+      }
+    });
+
     singleInput.addEventListener("keydown", function(e) {
       if (e.key === "Enter") {
         e.preventDefault();
@@ -129,6 +145,7 @@
         }
 
         singleInput.value = '';
+        setTimeout(() => { notice.innerHTML = ''; }, 1500); // 自動清空提示
       }
     });
 
@@ -145,24 +162,16 @@
     });
 
     function renderResults() {
-      const recent10 = numberList.slice(-10).reverse(); // 取最後 10 筆並反轉順序（最近輸入的放前）
-
-      const counts = {};
-      numberList.forEach(n => counts[n] = (counts[n] || 0) + 1);
-      const duplicates = Object.entries(counts)
-        .filter(([_, count]) => count > 1)
-        .map(([num]) => num);
+      const recent10 = numberList.slice(-10).reverse();
 
       let html = `
         <p>最近輸入（最新在前）：</p>
         <div class="sorted-box">${recent10.join(', ')}</div>
       `;
 
-      if (duplicates.length > 0) {
-        html += `<p class="duplicate">⚠️ 重複數字：${duplicates.join(', ')}</p>`;
-      } else {
-        html += `<p class="success">✅ 沒有重複數字。</p>`;
-      }
+      html += numberList.length === new Set(numberList).size
+        ? `<p class="success">✅ 沒有重複數字。</p>`
+        : `<p class="duplicate">⚠️ 有重複項目。</p>`;
 
       resultDiv.innerHTML = html;
     }
