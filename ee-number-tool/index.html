@@ -82,7 +82,7 @@
 <body>
   <h2>頻道紀錄小幫手</h2>
 
-  <p>快速單筆輸入（即時顯示狀態，Enter 送出）：</p>
+  <p>快速單筆輸入（按 Enter 送出）：</p>
   <input type="text" id="singleInput" placeholder="輸入一個數字按 Enter">
   <div class="notice" id="notice"></div>
 
@@ -98,30 +98,47 @@
     const notice = document.getElementById("notice");
 
     let numberList = [];
+    let rawHistory = [];
 
     function toHalfWidth(str) {
       return str.replace(/[\uFF10-\uFF19]/g, d => String.fromCharCode(d.charCodeAt(0) - 0xFF10 + 0x30));
     }
 
     function updateBulkInputAndRender() {
-      numberList = [...new Set(numberList)].sort((a, b) => a - b);
+      const uniqueSorted = [...new Set(numberList)].sort((a, b) => a - b);
+      numberList = uniqueSorted;
       bulkInput.value = numberList.join(', ');
       renderResults();
     }
 
-    singleInput.addEventListener("input", () => {
+    function renderResults() {
+      const recent10 = rawHistory.slice(-10).reverse();
+
+      let html = `
+        <p>最近輸入（最新在前）：</p>
+        <div class="sorted-box">${recent10.join(', ')}</div>
+      `;
+
+      html += numberList.length === new Set(numberList).size
+        ? `<p class="success">✅ 沒有重複數字。</p>`
+        : `<p class="duplicate">⚠️ 有重複項目。</p>`;
+
+      resultDiv.innerHTML = html;
+    }
+
+    singleInput.addEventListener("input", function () {
       const raw = toHalfWidth(singleInput.value.trim());
       const num = Number(raw);
 
       if (raw === '' || isNaN(num)) {
-        notice.innerHTML = '';
+        notice.innerHTML = '<span class="duplicate">請輸入有效的數字。</span>';
         return;
       }
 
       if (numberList.includes(num)) {
         notice.innerHTML = `<span class="duplicate">⚠️ ${num} 已經存在，請嘗試新頻道。</span>`;
       } else {
-        notice.innerHTML = `<span class="success">✔️ ${num} 有效</span>`;
+        notice.innerHTML = `<span class="success">✅ 可新增 ${num}</span>`;
       }
     });
 
@@ -136,16 +153,17 @@
           return;
         }
 
-        if (numberList.includes(num)) {
-          notice.innerHTML = `<span class="duplicate">⚠️ ${num} 已經存在，請嘗試新頻道。</span>`;
-        } else {
+        if (!numberList.includes(num)) {
           numberList.push(num);
+          rawHistory.push(num);
           notice.innerHTML = `<span class="success">✅ 已加入 ${num}</span>`;
           updateBulkInputAndRender();
+        } else {
+          notice.innerHTML = `<span class="duplicate">⚠️ ${num} 已經存在，請嘗試新頻道。</span>`;
         }
 
         singleInput.value = '';
-        setTimeout(() => { notice.innerHTML = ''; }, 1500); // 自動清空提示
+        setTimeout(() => { notice.innerHTML = ''; }, 1500);
       }
     });
 
@@ -158,23 +176,9 @@
         .filter(n => !isNaN(n));
 
       numberList = [...new Set(numbers)];
+      rawHistory = [...numberList];
       updateBulkInputAndRender();
     });
-
-    function renderResults() {
-      const recent10 = numberList.slice(-10).reverse();
-
-      let html = `
-        <p>最近輸入（最新在前）：</p>
-        <div class="sorted-box">${recent10.join(', ')}</div>
-      `;
-
-      html += numberList.length === new Set(numberList).size
-        ? `<p class="success">✅ 沒有重複數字。</p>`
-        : `<p class="duplicate">⚠️ 有重複項目。</p>`;
-
-      resultDiv.innerHTML = html;
-    }
   </script>
 </body>
 </html>
