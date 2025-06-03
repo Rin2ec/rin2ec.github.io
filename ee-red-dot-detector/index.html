@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>紅點偵測器（網頁版）</title>
+  <style>
+    body {
+      font-family: 'Microsoft JhengHei', sans-serif;
+      text-align: center;
+      background: linear-gradient(135deg, #1e1e2f, #2c2c3e);
+      color: white;
+      margin: 0;
+      padding: 0px;
+    }
+    canvas {
+      border: 2px solid #888;
+      margin-top: 5px;
+      cursor: crosshair;
+      border-radius: 10px;
+      background: #000;
+    }
+    #alert {
+      font-size: 16px;
+      margin-bottom: 5px;
+      display: block;
+      min-height: 26px;
+    }
+    #controls {
+      margin-top: 5px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    button {
+      background: #0066cc;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease-in-out;
+    }
+    button:hover {
+      background: #005bb5;
+      box-shadow: 0 4px 16px rgba(255, 255, 255, 0.3);
+    }
+    #volumeControl {
+      margin-top: 5px;
+    }
+    .detected {
+      color: #ff4c4c;
+      font-weight: bold;
+    }
+    .not-detected {
+      color: #00ff99;
+    }
+  </style>
+</head>
+<body>
+  <h2>紅點偵測器（網頁版）</h2>
+
+  <div id="controls">
+    <button id="toggleBtn">選擇畫面</button>
+  </div>
+
+  <p id="alert" class="not-detected">🔎尚未開始偵測</p>
+  <label id="volumeControl">
+    音量：<input type="range" min="0" max="2" step="0.01" id="volumeSlider" value="1">
+  </label>
+  <br/>
+  <video id="screenVideo" autoplay muted style="display:none"></video>
+  <canvas id="screenCanvas" width="400" height="350"></canvas>
+  <audio id="alertSound" src="https://assets.mixkit.co/active_storage/sfx/2574/2574-preview.mp3" preload="auto"></audio>
+
+  <script>
+    const toggleBtn = document.getElementById("toggleBtn");
+    const video = document.getElementById("screenVideo");
+    const canvas = document.getElementById("screenCanvas");
+    const ctx = canvas.getContext("2d");
+    const alertText = document.getElementById("alert");
+    const alertSound = document.getElementById("alertSound");
+    const volumeSlider = document.getElementById("volumeSlider");
+
+    alertSound.volume = parseFloat(volumeSlider.value);
+    volumeSlider.oninput = () => {
+      alertSound.volume = parseFloat(volumeSlider.value);
+    };
+
+    let detecting = false;
+    let selection = { x: 0, y: 0, w: 200, h: 150 }; // default to top-left quarter for performance
+    let startX, startY, endX, endY, isSelecting = false;
+    let wasRedDetected = false;
+
+    toggleBtn.onclick = async () => {
+      if (!detecting) {
+        const sources = await navigator.mediaDevices.getDisplayMedia({
+          video: {
+            displaySurface: "window",
+            selfBrowserSurface: "exclude"
+          },
+          audio: false
+        });
+        video.srcObject = sources;
+        video.play();
+        detecting = true;
+        toggleBtn.textContent = "停止偵測";
+        detectLoop();
+      } else {
+        detecting = false;
+        alertText.textContent = "🔕 已停止偵測";
+        alertText.className = "not-detected";
+        const tracks = video.srcObject?.getTracks();
+        tracks?.forEach(track => track.stop());
+        video.srcObject = null;
+        toggleBtn.textContent = "選擇畫面";
+      }
+    };
+
+    canvas.addEventListener('mousedown', e => {
+      const rect = canvas.getBoundingClientRect();
+      startX = endX = Math.floor(e.clientX - rect.left);
+      startY = endY = Math.floor(e.clientY - rect.top);
+      isSelecting = true;
+    });
+
+    canvas.addEventListener('mousemove', e => {
+      if (isSelecting) {
+        const rect = canvas.getBoundingClientRect();
+        endX = Math.floor(e.clientX - rect.left);
+        endY = Math.floor(e.clientY - rect.top);
+      }
+    });
+
+    canvas.addEventListener('mouseup', e => {
+      const rect = canvas.getBoundingClientRect();
+      endX = Math.floor(e.clientX - rect.left);
+      endY = Math.floor(e.clientY - rect.top);
+      isSelecting = false;
+      selection = {
+        x: Math.min(startX, endX),
+        y: Math.min(startY, endY),
+        w: Math.abs(endX - startX),
+        h: Math.abs(endY - startY)
+      };
+      localStorage.setItem("selection", JSON.stringify(selection));
+    });
+
+    const savedSelection = localStorage.getItem("selection");
+    if (savedSelection) selection = JSON.parse(savedSelection);
+
+    function detectLoop() {
+      if (!detecting) return;
+
+      ctx.drawImage(video, 0, 0, 400, 350, 0, 0, 400, 350);
+
+      if (isSelecting) {
+        const tempX = Math.min(startX, endX);
+        const tempY = Math.min(startY, endY);
+        const tempW = Math.abs(endX - startX);
+        const tempH = Math.abs(endY - startY);
+        ctx.strokeStyle = "lime";
+        ctx.setLineDash([5, 3]);
+        ctx.lineWidth = 2;
+        ctx.strokeRect(tempX, tempY, tempW, tempH);
+        ctx.setLineDash([]);
+      } else if (selection) {
+        ctx.strokeStyle = "lime";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(selection.x, selection.y, selection.w, selection.h);
+      }
+
+      let redPixelCount = 0;
+      if (selection && !isSelecting) {
+        const frame = ctx.getImageData(selection.x, selection.y, selection.w, selection.h);
+        const data = frame.data;
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i], g = data[i + 1], b = data[i + 2];
+          if (r > 150 && g < 80 && b < 80) redPixelCount++;
+        }
+      }
+
+      if (redPixelCount > 100) {
+        alertText.textContent = "⚠️偵測到紅點！";
+        alertText.className = "detected";
+        if (!wasRedDetected) {
+          alertSound.currentTime = 0;
+          alertSound.play();
+        }
+        wasRedDetected = true;
+      } else {
+        alertText.textContent = "🔎即時偵測中...";
+        alertText.className = "not-detected";
+        wasRedDetected = false;
+      }
+
+      setTimeout(detectLoop, 1000);
+    }
+  </script>
+</body>
+</html>
