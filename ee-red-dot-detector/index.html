@@ -90,7 +90,10 @@
     };
 
     let detecting = false;
-    let selection = { x: 0, y: 0, w: 200, h: 150 }; // default to top-left quarter for performance
+
+    // 預設整個畫面為偵測區域
+    let selection = { x: 0, y: 0, w: canvas.width, h: canvas.height };
+
     let startX, startY, endX, endY, isSelecting = false;
     let wasRedDetected = false;
 
