@@ -72,7 +72,7 @@
   </label>
   <br/>
   <video id="screenVideo" autoplay muted style="display:none"></video>
-  <canvas id="screenCanvas" width="380" height="440"></canvas>
+  <canvas id="screenCanvas" width="500" height="500"></canvas>
   <audio id="alertSound" src="https://assets.mixkit.co/active_storage/sfx/2574/2574-preview.mp3" preload="auto"></audio>
 
   <script>
@@ -154,7 +154,7 @@
     function detectLoop() {
       if (!detecting) return;
 
-      ctx.drawImage(video, 0, 0, 380, 440, 0, 0, 380, 440);
+      ctx.drawImage(video, 0, 0, 500, 500, 0, 0, 500, 500);
 
       if (isSelecting) {
         const tempX = Math.min(startX, endX);
