@@ -63,7 +63,7 @@
   <h2>紅點偵測器（網頁版）</h2>
 
   <div id="controls">
-    <button id="toggleBtn">選擇視窗</button>
+    <button id="toggleBtn">選擇畫面</button>
   </div>
 
   <p id="alert" class="not-detected">🔎尚未開始偵測</p>
@@ -90,10 +90,7 @@
     };
 
     let detecting = false;
-
-    // 預設整個畫面為偵測區域
     let selection = { x: 0, y: 0, w: canvas.width, h: canvas.height };
-
     let startX, startY, endX, endY, isSelecting = false;
     let wasRedDetected = false;
 
@@ -169,6 +166,9 @@
         ctx.lineWidth = 2;
         ctx.strokeRect(tempX, tempY, tempW, tempH);
         ctx.setLineDash([]);
+
+        requestAnimationFrame(detectLoop);
+        return;
       } else if (selection) {
         ctx.strokeStyle = "lime";
         ctx.lineWidth = 2;
