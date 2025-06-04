@@ -28,7 +28,7 @@
 
     h1 {
       color: #ffcc70;
-      margin-bottom: 25px;
+      margin-top: -15px;
       font-size: 28px;
     }
 
@@ -49,23 +49,27 @@
       margin-bottom: 12px;
     }
 
-    input[type="number"], input[type="datetime-local"] {
+    input[type="number"], input[type="datetime-local"], select {
       background-color: #2e2e3e;
       color: #ffffff;
       border: 1px solid #555;
       padding: 10px;
       border-radius: 6px;
-      flex: 1;
+      width: 100%;
+    }
+
+    #bossSelector {
+      max-width: 400px;
+      margin-bottom: 6px;
     }
 
     input[type="datetime-local"] {
-      width: 100%;
       max-width: 400px;
-      margin-bottom: 12px;
+      margin-bottom: 6px;
     }
 
     button {
-      margin-top: 25px;
+      margin-top: 10px;
       background: linear-gradient(to right, #ff7e5f, #feb47b);
       color: #1e1e2f;
       padding: 12px 30px;
@@ -112,8 +116,8 @@
     }
 
     .footer {
-      margin-top: 40px;
-      font-size: 14px;
+      margin-top: 5px;
+      font-size: 12px;
     }
 
     .footer a {
@@ -139,6 +143,13 @@
 
     <label for="repairTime">伺服器開機時間：</label>
     <input type="datetime-local" id="repairTime" />
+
+    <label for="bossSelector">選擇 BOSS (可選)：</label>
+    <div class="input-group">
+      <select id="bossSelector" onchange="onBossChange()">
+        <option value="">-- 請選擇 BOSS --</option>
+      </select>
+    </div>
 
     <label>重生最短時間：</label>
     <div class="input-group">
@@ -181,6 +192,87 @@
   </div>
 
   <script>
+    const bossList = [
+      {
+        name: "🍢黑輪王",
+        minHour: 13,
+        minMinute: 0,
+        maxHour: 17,
+        maxMinute: 0
+      },
+      {
+        name: "👹巴洛古",
+        minHour: 6,
+        minMinute: 45,
+        maxHour: 9,
+        maxMinute: 0
+      },
+      {
+        name: "🦊九尾妖狐",
+        minHour: 3,
+        minMinute: 30,
+        maxHour: 9,
+        maxMinute: 30
+      },
+      {
+        name: "👻書生幽靈",
+        minHour: 2,
+        minMinute: 30,
+        maxHour: 5,
+        maxMinute: 0
+      },
+      {
+        name: "🍄殭屍蘑菇王",
+        minHour: 3,
+        minMinute: 15,
+        maxHour: 3,
+        maxMinute: 45
+      },
+      {
+        name: "🍄蘑菇王",
+        minHour: 3,
+        minMinute: 30,
+        maxHour: 4,
+        maxMinute: 0
+      },
+      {
+        name: "🧙‍♀️雪山魔女",
+        minHour: 2,
+        minMinute: 38,
+        maxHour: 3,
+        maxMinute: 0
+      },
+      {
+        name: "🤖葛雷金剛",
+        minHour: 4,
+        minMinute: 30,
+        maxHour: 5,
+        maxMinute: 50
+      }
+    ];
+
+    function populateBossOptions() {
+      const select = document.getElementById('bossSelector');
+      bossList.forEach((boss, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = boss.name;
+        select.appendChild(option);
+      });
+    }
+
+    function onBossChange() {
+      const index = document.getElementById('bossSelector').value;
+      if (index === "") return;
+      const boss = bossList[parseInt(index)];
+      document.getElementById('minRespawnHour').value = boss.minHour;
+      document.getElementById('minRespawnMinute').value = boss.minMinute;
+      document.getElementById('maxRespawnHour').value = boss.maxHour;
+      document.getElementById('maxRespawnMinute').value = boss.maxMinute;
+    }
+
+    window.addEventListener('DOMContentLoaded', populateBossOptions);
+
     function calculateRespawn() {
       const repairTimeInput = document.getElementById('repairTime').value;
       const minHours = parseInt(document.getElementById('minRespawnHour').value) || 0;
