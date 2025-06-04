@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>野王重生時間計算器</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #1e1e2f;
+      color: #ffffff;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    h1 {
+      color: #ffcc70;
+      margin-bottom: 25px;
+      font-size: 28px;
+    }
+
+    label {
+      display: block;
+      margin: 12px 0 5px;
+      font-weight: bold;
+      text-align: left;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 400px;
+      margin-bottom: 12px;
+    }
+
+    input[type="number"], input[type="datetime-local"] {
+      background-color: #2e2e3e;
+      color: #ffffff;
+      border: 1px solid #555;
+      padding: 10px;
+      border-radius: 6px;
+      flex: 1;
+    }
+
+    input[type="datetime-local"] {
+      width: 100%;
+      max-width: 400px;
+      margin-bottom: 12px;
+    }
+
+    button {
+      margin-top: 25px;
+      background: linear-gradient(to right, #ff7e5f, #feb47b);
+      color: #1e1e2f;
+      padding: 12px 30px;
+      font-weight: bold;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 10px #ffb76b;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 700px;
+      margin-top: 30px;
+      background-color: #2a2a40;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      border: 1px solid #444;
+      padding: 12px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #3e3e5e;
+      color: #ffcc70;
+    }
+
+    tr:nth-child(even) {
+      background-color: #24243e;
+    }
+
+    tr:nth-child(odd) {
+      background-color: #2e2e4e;
+    }
+
+    .footer {
+      margin-top: 40px;
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: #70d6ff;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    #statusMessage {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #70ff94;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>野王重生時間計算器</h1>
+
+    <label for="repairTime">伺服器開機時間：</label>
+    <input type="datetime-local" id="repairTime" />
+
+    <label>重生最短時間：</label>
+    <div class="input-group">
+      <input type="number" id="minRespawnHour" value="" min="0" placeholder="小時" />
+      <input type="number" id="minRespawnMinute" value="" min="0" max="59" placeholder="分鐘" />
+    </div>
+
+    <label>重生最長時間：</label>
+    <div class="input-group">
+      <input type="number" id="maxRespawnHour" value="" min="0" placeholder="小時" />
+      <input type="number" id="maxRespawnMinute" value="" min="0" max="59" placeholder="分鐘" />
+    </div>
+
+    <button onclick="calculateRespawn()">計算重生時間</button>
+
+    <div id="statusMessage"></div>
+
+    <table id="resultTable" style="display: none;">
+      <thead>
+        <tr>
+          <th>第 N 次</th>
+          <th>開始時間</th>
+          <th>結束時間</th>
+        </tr>
+      </thead>
+      <tbody id="resultBody"></tbody>
+    </table>
+
+    <div class="footer">
+      🔍查詢野王掉落與週期資訊請參考：  
+      <a href="https://a2983456456.github.io/artale-drop/" target="_blank">
+        https://a2983456456.github.io/artale-drop/
+      </a>
+      <br>
+      🔍 維修開機公告請參考：  
+      <a href="https://discord.com/channels/1364050807544090695/1364210991411232828" target="_blank">
+        Artale (繁體中文版) Discord 公告
+      </a>
+    </div>
+  </div>
+
+  <script>
+    function calculateRespawn() {
+      const repairTimeInput = document.getElementById('repairTime').value;
+      const minHours = parseInt(document.getElementById('minRespawnHour').value) || 0;
+      const minMinutes = parseInt(document.getElementById('minRespawnMinute').value) || 0;
+      const maxHours = parseInt(document.getElementById('maxRespawnHour').value) || 0;
+      const maxMinutes = parseInt(document.getElementById('maxRespawnMinute').value) || 0;
+
+      if (!repairTimeInput) {
+        alert("請輸入正確的時間與數值！");
+        return;
+      }
+
+      const minMs = (minHours * 60 + minMinutes) * 60000;
+      const maxMs = (maxHours * 60 + maxMinutes) * 60000;
+
+      const repairTime = new Date(repairTimeInput);
+      const resultBody = document.getElementById('resultBody');
+      const statusMessage = document.getElementById('statusMessage');
+      resultBody.innerHTML = "";
+      statusMessage.innerHTML = "";
+
+      let baseTime = new Date(repairTime);
+      const now = new Date();
+      let matchedInterval = null;
+
+      for (let i = 1; i <= 20; i++) {
+        const start = new Date(baseTime.getTime() + minMs);
+        const end = new Date(baseTime.getTime() + maxMs);
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>第 ${i} 次</td>
+          <td>${formatDate(start)}</td>
+          <td>${formatDate(end)}</td>
+        `;
+        resultBody.appendChild(row);
+
+        if (!matchedInterval && now >= start && now <= end) {
+          matchedInterval = `⌛ 現在時間落在第 ${i} 次重生區間內！`;
+        }
+
+        baseTime = new Date(baseTime.getTime() + maxMs);
+      }
+
+      if (!matchedInterval) {
+        statusMessage.innerText = "⚠️ 現在時間不在任何預測的重生區間內。";
+      } else {
+        statusMessage.innerText = matchedInterval;
+      }
+
+      document.getElementById('resultTable').style.display = 'table';
+    }
+
+    function formatDate(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      const h = String(date.getHours()).padStart(2, '0');
+      const min = String(date.getMinutes()).padStart(2, '0');
+      return `${y}/${m}/${d} ${h}:${min}`;
+    }
+  </script>
+</body>
+</html>
