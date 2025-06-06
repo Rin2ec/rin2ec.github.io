@@ -87,7 +87,7 @@
   <div class="notice" id="notice"></div>
 
   <p>（可選）貼上大量數字（用逗號、空格、換行分隔，全形也可以）：</p>
-  <textarea id="bulkInput" placeholder="例如：１２３，４５，６，６，７８９"></textarea>
+  <textarea id="bulkInput" placeholder="例如：１２３，４５，６，７８９"></textarea>
 
   <div class="result" id="result"></div>
 
@@ -112,11 +112,11 @@
     }
 
     function renderResults() {
-      const recent10 = rawHistory.slice(-10).reverse();
+      const recent100 = rawHistory.slice(-100).reverse();
 
       let html = `
         <p>最近輸入（最新在前）：</p>
-        <div class="sorted-box">${recent10.join(', ')}</div>
+        <div class="sorted-box">${recent100.join(', ')}</div>
       `;
 
       html += numberList.length === new Set(numberList).size
