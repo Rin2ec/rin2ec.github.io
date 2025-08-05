@@ -135,6 +135,31 @@
       font-weight: bold;
       color: #70ff94;
     }
+
+
+    .button-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+
+.button-row button {
+  padding: 12px 30px;
+  font-weight: bold;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.button-row button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
   </style>
 </head>
 <body>
@@ -144,35 +169,56 @@
     <label for="repairTime">伺服器開機時間：</label>
     <input type="datetime-local" id="repairTime" />
 
-    <label for="bossSelector">選擇 BOSS (可選)：</label>
+    <label for="bossSelector">選擇 BOSS ：</label>
     <div class="input-group">
       <select id="bossSelector" onchange="onBossChange()">
         <option value="">-- 請選擇 BOSS --</option>
       </select>
     </div>
 
-    <label>重生最短時間：</label>
-    <div class="input-group">
-      <input type="number" id="minRespawnHour" value="" min="0" placeholder="小時" />
-      <input type="number" id="minRespawnMinute" value="" min="0" max="59" placeholder="分鐘" />
+    <div id="manualRespawnInputs" style="display: none;">
+      <label>重生最短時間：</label>
+      <div class="input-group">
+        <input type="number" id="minRespawnHour" value="" min="0" placeholder="小時" />
+        <input type="number" id="minRespawnMinute" value="" min="0" max="59" placeholder="分鐘" />
+      </div>
+
+      <label>重生最長時間：</label>
+      <div class="input-group">
+        <input type="number" id="maxRespawnHour" value="" min="0" placeholder="小時" />
+        <input type="number" id="maxRespawnMinute" value="" min="0" max="59" placeholder="分鐘" />
+      </div>
     </div>
 
-    <label>重生最長時間：</label>
-    <div class="input-group">
-      <input type="number" id="maxRespawnHour" value="" min="0" placeholder="小時" />
-      <input type="number" id="maxRespawnMinute" value="" min="0" max="59" placeholder="分鐘" />
+    <div class="button-row">
+      <button class="calculate-btn" onclick="calculateRespawn()">計算BOSS重生時間</button>
+      <button class="check-btn" onclick="checkCurrentRespawningBosses()">查詢當前可能重生的BOSS</button>
     </div>
 
-    <button onclick="calculateRespawn()">計算重生時間</button>
 
+    <table id="currentBossTable" style="display: none;">
+      <thead>
+        <tr>
+          <th>BOSS 名稱</th>
+          <th>第 N 次</th>
+          <th>預計重生開始時間</th>
+          <th>預計重生結束時間</th>
+        </tr>
+      </thead>
+      <tbody id="currentBossBody"></tbody>
+    </table>
+
+    <div id="warningMessage" style="margin-top: 10px; max-width: 600px; color: #white; font-weight: bold; font-size: 12px;">
+    📍伺服器開機後的前幾次預估時間相對準確，之後可能因加開分流或擊殺時間延遲而有誤差，請以實際重生時間為主。
+    </div>
     <div id="statusMessage"></div>
 
     <table id="resultTable" style="display: none;">
       <thead>
         <tr>
           <th>第 N 次</th>
-          <th>預計開始時間</th>
-          <th>預計結束時間</th>
+          <th>預計重生開始時間</th>
+          <th>預計重生結束時間</th>
         </tr>
       </thead>
       <tbody id="resultBody"></tbody>
@@ -194,60 +240,102 @@
   <script>
     const bossList = [
       {
-        name: "🍢黑輪王",
-        minHour: 13,
-        minMinute: 0,
-        maxHour: 17,
-        maxMinute: 0
-      },
-      {
-        name: "👹巴洛古",
-        minHour: 6,
-        minMinute: 45,
-        maxHour: 9,
-        maxMinute: 0
-      },
-      {
-        name: "🦊九尾妖狐",
-        minHour: 3,
-        minMinute: 30,
-        maxHour: 9,
-        maxMinute: 30
-      },
-      {
-        name: "👻書生幽靈",
+        name: "😈瘋狂喵z客 (2小時 ~ 7小時)",
         minHour: 2,
-        minMinute: 30,
-        maxHour: 5,
+        minMinute: 0,
+        maxHour: 7,
         maxMinute: 0
       },
       {
-        name: "🍄殭屍蘑菇王",
-        minHour: 3,
-        minMinute: 15,
-        maxHour: 3,
-        maxMinute: 45
-      },
-      {
-        name: "🍄蘑菇王",
-        minHour: 3,
-        minMinute: 30,
-        maxHour: 4,
-        maxMinute: 0
-      },
-      {
-        name: "🧙‍♀️雪山魔女",
+        name: "🪵仙人娃娃 (2小時38分 ~ 3小時)",
         minHour: 2,
         minMinute: 38,
         maxHour: 3,
         maxMinute: 0
       },
       {
-        name: "🤖葛雷金剛",
+        name: "👹巴洛古 (6小時45分 ~ 9小時)",
+        minHour: 6,
+        minMinute: 45,
+        maxHour: 9,
+        maxMinute: 0
+      },
+      {
+        name: "🦊九尾妖狐 (3小時30分 ~ 9小時30分)",
+        minHour: 3,
+        minMinute: 30,
+        maxHour: 9,
+        maxMinute: 30
+      },
+      {
+        name: "👻書生幽靈 (2小時30分 ~ 5小時)",
+        minHour: 2,
+        minMinute: 30,
+        maxHour: 5,
+        maxMinute: 0
+      },
+      {
+        name: "🍄殭屍蘑菇王 (3小時15分 ~ 3小時45分)",
+        minHour: 3,
+        minMinute: 15,
+        maxHour: 3,
+        maxMinute: 45
+      },
+      {
+        name: "🍄蘑菇王 (3小時30分 ~ 4小時)",
+        minHour: 3,
+        minMinute: 30,
+        maxHour: 4,
+        maxMinute: 0
+      },
+      {
+        name: "🧙‍♀️雪山魔女 (2小時38分 ~ 3小時)",
+        minHour: 2,
+        minMinute: 38,
+        maxHour: 3,
+        maxMinute: 0
+      },
+      {
+        name: "🤖葛雷金剛 (4小時30分 ~ 5小時50分)",
         minHour: 4,
         minMinute: 30,
         maxHour: 5,
         maxMinute: 50
+      },
+      {
+        name: "⛄雪毛怪人 (45分 ~ 1小時8分)",
+        minHour: 0,
+        minMinute: 45,
+        maxHour: 1,
+        maxMinute: 8
+      },
+      {
+        name: "💀厄運死神 (45分 ~ 1小時45分)",
+        minHour: 0,
+        minMinute: 45,
+        maxHour: 1,
+        maxMinute: 45
+      },
+      {
+        name: "🐱喵怪仙人 (2小時30分 ~ 2小時50分)",
+        minHour: 2,
+        minMinute: 30,
+        maxHour: 2,
+        maxMinute: 50
+      },
+      {
+        name: "🐻肯德熊 (1小時53分 ~ 2小時8分)",
+        minHour: 1,
+        minMinute: 53,
+        maxHour: 2,
+        maxMinute: 8
+      },
+      {
+        name: "🫚巨大深山人蔘 (1小時 ~ 2小時15分)",
+        minHour: 1,
+        minMinute: 0,
+        maxHour: 2,
+        maxMinute: 15
       }
     ];
 
@@ -275,6 +363,7 @@
 
     function calculateRespawn() {
       const repairTimeInput = document.getElementById('repairTime').value;
+      const bossSelectorValue = document.getElementById('bossSelector').value;
       const minHours = parseInt(document.getElementById('minRespawnHour').value) || 0;
       const minMinutes = parseInt(document.getElementById('minRespawnMinute').value) || 0;
       const maxHours = parseInt(document.getElementById('maxRespawnHour').value) || 0;
@@ -282,6 +371,11 @@
 
       if (!repairTimeInput) {
         alert("請輸入正確的時間與數值！");
+        return;
+      }
+
+        if (!bossSelectorValue) {
+        alert("請選擇BOSS！");
         return;
       }
 
@@ -298,7 +392,7 @@
       const now = new Date();
       let matchedInterval = null;
 
-      for (let i = 1; i <= 20; i++) {
+      for (let i = 1; i <= 50; i++) {
         const start = new Date(baseTime.getTime() + minMs);
         const end = new Date(baseTime.getTime() + maxMs);
 
@@ -334,6 +428,60 @@
       const min = String(date.getMinutes()).padStart(2, '0');
       return `${y}/${m}/${d} ${h}:${min}`;
     }
+
+    function checkCurrentRespawningBosses() {
+  const repairTimeInput = document.getElementById('repairTime').value;
+  if (!repairTimeInput) {
+    alert("請先輸入伺服器開機時間！");
+    return;
+  }
+
+  const repairTime = new Date(repairTimeInput);
+  const now = new Date();
+  const currentBossBody = document.getElementById('currentBossBody');
+  currentBossBody.innerHTML = "";
+
+  let hasMatch = false;
+
+  bossList.forEach(boss => {
+    const minMs = (boss.minHour * 60 + boss.minMinute) * 60000;
+    const maxMs = (boss.maxHour * 60 + boss.maxMinute) * 60000;
+
+    let baseTime = new Date(repairTime);
+
+    // 檢查 50 次重生區間內是否有符合當前時間的
+    for (let i = 1; i <= 50; i++) {
+      const start = new Date(baseTime.getTime() + minMs);
+      const end = new Date(baseTime.getTime() + maxMs);
+
+      if (now >= start && now <= end) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${boss.name}</td>
+          <td>第 ${i} 次</td>
+          <td>${formatDate(start)}</td>
+          <td>${formatDate(end)}</td>
+        `;
+        currentBossBody.appendChild(row);
+        hasMatch = true;
+        break; // 一個 BOSS 最多一筆
+      }
+
+      // 更新下一次基準時間
+      baseTime = new Date(baseTime.getTime() + maxMs);
+    }
+  });
+
+  document.getElementById('currentBossTable').style.display = hasMatch ? 'table' : 'none';
+
+  if (!hasMatch) {
+    const row = document.createElement('tr');
+    row.innerHTML = `<td colspan="4">目前時間不在任何 BOSS 的重生區間內。</td>`;
+    currentBossBody.appendChild(row);
+    document.getElementById('currentBossTable').style.display = 'table';
+  }
+}
+
   </script>
 </body>
 </html>
