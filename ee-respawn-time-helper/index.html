@@ -196,33 +196,16 @@
     </div>
 
 
-    <table id="currentBossTable" style="display: none;">
-      <thead>
-        <tr>
-          <th>BOSS 名稱</th>
-          <th>第 N 次</th>
-          <th>預計重生開始時間</th>
-          <th>預計重生結束時間</th>
-        </tr>
-      </thead>
-      <tbody id="currentBossBody"></tbody>
-    </table>
-
-    <div id="warningMessage" style="margin-top: 10px; max-width: 600px; color: #white; font-weight: bold; font-size: 12px;">
+    <div id="warningMessage" style="margin-top: 10px; max-width: 600px; color: #white; font-weight: bold; font-size: 10px;">
     📍伺服器開機後的前幾次預估時間相對準確，之後可能因加開分流或擊殺時間延遲而有誤差，請以實際重生時間為主。
     </div>
     <div id="statusMessage"></div>
 
     <table id="resultTable" style="display: none;">
-      <thead>
-        <tr>
-          <th>第 N 次</th>
-          <th>預計重生開始時間</th>
-          <th>預計重生結束時間</th>
-        </tr>
-      </thead>
+      <thead id="resultHead"></thead>
       <tbody id="resultBody"></tbody>
     </table>
+
 
     <div class="footer">
       🔍查詢野王掉落與週期資訊請參考：  
@@ -339,6 +322,12 @@
       }
     ];
 
+      let currentRespawnPage = 1;
+  let currentBossPage = 1;
+  const rowsPerPage = 20;
+  let respawnData = [];
+  let currentBossData = [];
+
     function populateBossOptions() {
       const select = document.getElementById('bossSelector');
       bossList.forEach((boss, index) => {
@@ -369,30 +358,38 @@
       const maxHours = parseInt(document.getElementById('maxRespawnHour').value) || 0;
       const maxMinutes = parseInt(document.getElementById('maxRespawnMinute').value) || 0;
 
-      if (!repairTimeInput) {
-        alert("請輸入正確的時間與數值！");
-        return;
-      }
-
-        if (!bossSelectorValue) {
-        alert("請選擇BOSS！");
+      if (!repairTimeInput || !bossSelectorValue) {
+        alert("請輸入正確的時間與選擇 BOSS！");
         return;
       }
 
       const minMs = (minHours * 60 + minMinutes) * 60000;
       const maxMs = (maxHours * 60 + maxMinutes) * 60000;
-
       const repairTime = new Date(repairTimeInput);
       const resultBody = document.getElementById('resultBody');
+      const resultHead = document.getElementById('resultHead');
       const statusMessage = document.getElementById('statusMessage');
+      const resultTable = document.getElementById('resultTable');
+
+      // ✅ 清除內容與狀態
       resultBody.innerHTML = "";
+      resultHead.innerHTML = "";
       statusMessage.innerHTML = "";
+
+      // ✅ 插入表頭（單 BOSS 模式）
+      resultHead.innerHTML = `
+        <tr>
+          <th>第 N 次</th>
+          <th>預計重生開始時間</th>
+          <th>預計重生結束時間</th>
+        </tr>
+      `;
 
       let baseTime = new Date(repairTime);
       const now = new Date();
       let matchedInterval = null;
 
-      for (let i = 1; i <= 50; i++) {
+      for (let i = 1; i <= 200; i++) {
         const start = new Date(baseTime.getTime() + minMs);
         const end = new Date(baseTime.getTime() + maxMs);
 
@@ -411,14 +408,81 @@
         baseTime = new Date(baseTime.getTime() + maxMs);
       }
 
-      if (!matchedInterval) {
-        statusMessage.innerText = "⚠️ 現在時間不在任何預測的重生區間內。";
-      } else {
-        statusMessage.innerText = matchedInterval;
+      statusMessage.innerText = matchedInterval || "⚠️ 現在時間不在任何預測的重生區間內。";
+      resultTable.style.display = 'table';
+    }
+
+
+    function checkCurrentRespawningBosses() {
+      const repairTimeInput = document.getElementById('repairTime').value;
+      if (!repairTimeInput) {
+        alert("請先輸入伺服器開機時間！");
+        return;
       }
 
-      document.getElementById('resultTable').style.display = 'table';
+      const repairTime = new Date(repairTimeInput);
+      const now = new Date();
+
+      const resultBody = document.getElementById('resultBody');
+      const resultHead = document.getElementById('resultHead');
+      const statusMessage = document.getElementById('statusMessage');
+      const resultTable = document.getElementById('resultTable');
+
+      // ✅ 清除先前內容
+      resultBody.innerHTML = "";
+      resultHead.innerHTML = "";
+      statusMessage.innerHTML = "";
+
+      // ✅ 插入表頭（多 BOSS 模式）
+      resultHead.innerHTML = `
+        <tr>
+          <th>BOSS 名稱</th>
+          <th>第 N 次</th>
+          <th>預計重生開始時間</th>
+          <th>預計重生結束時間</th>
+        </tr>
+      `;
+
+      let hasMatch = false;
+
+      bossList.forEach(boss => {
+        const minMs = (boss.minHour * 60 + boss.minMinute) * 60000;
+        const maxMs = (boss.maxHour * 60 + boss.maxMinute) * 60000;
+
+        let baseTime = new Date(repairTime);
+
+        for (let i = 1; i <= 200; i++) {
+          const start = new Date(baseTime.getTime() + minMs);
+          const end = new Date(baseTime.getTime() + maxMs);
+
+          if (now >= start && now <= end) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${boss.name}</td>
+              <td>第 ${i} 次</td>
+              <td>${formatDate(start)}</td>
+              <td>${formatDate(end)}</td>
+            `;
+            resultBody.appendChild(row);
+            hasMatch = true;
+            break;
+          }
+
+          baseTime = new Date(baseTime.getTime() + maxMs);
+        }
+      });
+
+      if (!hasMatch) {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td colspan="4">目前時間不在任何 BOSS 的重生區間內。</td>`;
+        resultBody.appendChild(row);
+      }
+
+      resultTable.style.display = 'table';
     }
+
+
+
 
     function formatDate(date) {
       const y = date.getFullYear();
@@ -428,59 +492,6 @@
       const min = String(date.getMinutes()).padStart(2, '0');
       return `${y}/${m}/${d} ${h}:${min}`;
     }
-
-    function checkCurrentRespawningBosses() {
-  const repairTimeInput = document.getElementById('repairTime').value;
-  if (!repairTimeInput) {
-    alert("請先輸入伺服器開機時間！");
-    return;
-  }
-
-  const repairTime = new Date(repairTimeInput);
-  const now = new Date();
-  const currentBossBody = document.getElementById('currentBossBody');
-  currentBossBody.innerHTML = "";
-
-  let hasMatch = false;
-
-  bossList.forEach(boss => {
-    const minMs = (boss.minHour * 60 + boss.minMinute) * 60000;
-    const maxMs = (boss.maxHour * 60 + boss.maxMinute) * 60000;
-
-    let baseTime = new Date(repairTime);
-
-    // 檢查 50 次重生區間內是否有符合當前時間的
-    for (let i = 1; i <= 50; i++) {
-      const start = new Date(baseTime.getTime() + minMs);
-      const end = new Date(baseTime.getTime() + maxMs);
-
-      if (now >= start && now <= end) {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${boss.name}</td>
-          <td>第 ${i} 次</td>
-          <td>${formatDate(start)}</td>
-          <td>${formatDate(end)}</td>
-        `;
-        currentBossBody.appendChild(row);
-        hasMatch = true;
-        break; // 一個 BOSS 最多一筆
-      }
-
-      // 更新下一次基準時間
-      baseTime = new Date(baseTime.getTime() + maxMs);
-    }
-  });
-
-  document.getElementById('currentBossTable').style.display = hasMatch ? 'table' : 'none';
-
-  if (!hasMatch) {
-    const row = document.createElement('tr');
-    row.innerHTML = `<td colspan="4">目前時間不在任何 BOSS 的重生區間內。</td>`;
-    currentBossBody.appendChild(row);
-    document.getElementById('currentBossTable').style.display = 'table';
-  }
-}
 
   </script>
 </body>
