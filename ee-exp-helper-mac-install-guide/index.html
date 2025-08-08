@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>伊伊經驗小幫手｜macOS 安裝與啟動指南</title>
+  <meta name="color-scheme" content="dark light" />
+  <style>
+    :root{
+      --bg:#0b1220;
+      --bg-2:#0e1830;
+      --card:#101b33cc;
+      --card-strong:#0d1529;
+      --text:#e8eefc;
+      --muted:#93a4c7;
+      --accent:#3aa0ff;
+      --accent-2:#7cc3ff;
+      --ok:#35d49a;
+      --warn:#ffd166;
+      --danger:#ff6b6b;
+      --shadow: 0 10px 30px rgba(7,12,24,.45), inset 0 1px 0 rgba(255,255,255,.05);
+      --radius:20px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+body{
+  margin:0;
+  font:16px/1.6 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans";
+  color:var(--text);
+  background: var(--bg-2); /* 原來那串多層 gradient 先移除 */
+  padding:28px;
+  position: relative; /* 為 ::before 建立定位參考 */
+  min-height: 100vh;
+}
+body::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(1200px 600px at 120% -10%, rgba(58,160,255,.18), transparent 65%),
+    radial-gradient(1000px 520px at -10% 110%, rgba(20,180,200,.14), transparent 65%),
+    linear-gradient(180deg, var(--bg), var(--bg-2));
+  pointer-events: none;
+}
+    .wrap{max-width:980px;margin:0 auto}
+    .hero{
+      position:relative;padding:28px 28px 24px;border-radius:var(--radius);
+      background:linear-gradient(180deg, rgba(16,27,51,.9), rgba(11,18,32,.9));
+      box-shadow:var(--shadow);overflow:hidden;
+    }
+    .hero::after{
+      content:"";position:absolute; inset:auto -10% -40% -10%;height:220px;
+      background: radial-gradient(600px 180px at 50% 0%, rgba(122,196,255,.15), transparent 70%);
+      pointer-events:none;
+    }
+    .title{display:flex; gap:14px; align-items:center; flex-wrap:wrap}
+    .title h1{margin:0; font-weight:800; letter-spacing:.3px; font-size: clamp(24px, 3.2vw, 36px)}
+    .badge{padding:4px 10px; border-radius:999px; background:#0f2244; color:#bcd3ff; border:1px solid #203a70; font-size:12px; letter-spacing:.5px}
+    .subtitle{margin:6px 0 0; color:var(--muted)}
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .card{
+      background:linear-gradient(180deg, rgba(17,29,51,.65), rgba(12,20,36,.9));
+      border:1px solid #1f2c4a;border-radius:var(--radius);
+      box-shadow:var(--shadow); padding:18px; backdrop-filter: blur(6px);
+    }
+    .steps{counter-reset:s}
+    .step{
+      display:flex; gap:14px; align-items:flex-start;
+      padding:14px; border-radius:16px; border:1px solid #1c2a49; background:#0e1830aa;
+    }
+    .step + .step{margin-top:12px}
+    .num{
+      width:34px; height:34px; border-radius:10px; display:grid; place-items:center;
+      background:linear-gradient(180deg,#1a2c52,#10203e); border:1px solid #274172;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.1); color:#cfe2ff; font-weight:700;
+    }
+    code, pre{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      background:#0b1430; color:#d7e7ff; border:1px solid #22365f; border-radius:12px;
+    }
+    code{padding:2px 6px}
+    pre{padding:12px; overflow:auto; margin:10px 0 0}
+    .cmd{display:flex; gap:10px; align-items:stretch; margin-top:12px}
+    .cmd input{
+      flex:1; background:#0b1430; border:1px solid #22365f; border-radius:12px; padding:12px 12px; color:#cfe2ff;
+    }
+    .btn{
+      border:1px solid #264676; background:linear-gradient(180deg,#1e3a6b,#16345f);
+      color:#d9e7ff; padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:600;
+      box-shadow:var(--shadow); transition: transform .06s, filter .2s;
+    }
+    .btn:hover{ filter: brightness(1.08) }
+    .btn:active{ transform: translateY(1px) }
+    .note{
+      display:flex; gap:10px; align-items:flex-start; padding:12px 14px; border-radius:12px;
+      background:#12203f; border:1px dashed #2a477a; color:#cfe2ff; margin:10px 0 0;
+    }
+    .note .k{ font-weight:700; color:#9ed1ff }
+    .muted{ color:var(--muted) }
+    details{ border:1px solid #1f2c4a; border-radius:12px; padding:10px 12px; background:#0f1a33 }
+    summary{ cursor:pointer; font-weight:700; color:#bcd3ff }
+    .footer{ margin-top:18px; color:#7f93b8; font-size:13px }
+    .kbd{ border:1px solid #3b5585; padding:2px 6px; border-radius:6px; background:#0d1b33; color:#cfe2ff }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px;
+      border:1px solid #264a7e; background:#0d1c36; color:#bcd3ff; font-size:13px
+    }
+    .hr{height:1px;background:linear-gradient(90deg,transparent,#1f2d4b,transparent); margin:14px 0}
+
+    a {
+  color: #87cefa; /* 天空藍 SkyBlue */
+  text-decoration: none;
+}
+a:hover {
+  color: #b0e2ff; /* 比天空藍更亮一點 */
+  text-decoration: underline;
+}
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="title">
+        <h1>伊伊經驗小幫手｜macOS 安裝與啟動指南</h1>
+        <span class="badge">作者：凜</span>
+      </div>
+      <p class="subtitle">若第一次開啟顯示「無法開啟」或沒有反應，請依下列流程處理 Gatekeeper（隔離屬性）。</p>
+
+      <div class="grid">
+        <div class="card">
+          <h2 style="margin:4px 0 12px">快速步驟</h2>
+          <div class="steps">
+            <div class="step">
+              <div class="num">1</div>
+              <div><b>雙擊</b> <code>DMG</code> 檔。</div>
+            </div>
+
+            <div class="step">
+              <div class="num">2</div>
+              <div>把 <code>伊伊經驗小幫手.app</code> 拖曳到 <b>Applications</b>（應用程式）資料夾。</div>
+            </div>
+
+            <div class="step">
+              <div class="num">3</div>
+              <div>開啟 <b>終端機</b>（<span class="muted">應用程式 → 工具程式</span>）</div>
+            </div>
+
+            <div class="step">
+              <div class="num">4</div>
+              <div style="width:100%">
+                在終端機輸入下列指令（<b>最後記得加上空格</b>）：
+                <pre><code>sudo xattr -r -d com.apple.quarantine </code></pre>
+                  <div class="cmd">
+                  <input id="cmdFull" value='sudo xattr -r -d com.apple.quarantine ' aria-label="完整指令" />
+                  <button class="btn" data-copy="#cmdFull">複製指令(最後記得加上空格)</button>
+                </div>
+                <div class="note"><span class="k">提示</span>：密碼輸入時不會顯示字元是正常現象。</div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="num">5</div>
+              <div style="width:100%">
+                在 <b>Finder</b> 把 <code>/Applications/伊伊經驗小幫手.app</code> 拖曳到終端機，路徑會自動補上。<br/>
+                例如：
+                <pre><code>sudo xattr -r -d com.apple.quarantine "/Applications/伊伊經驗小幫手.app"</code></pre>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="num">6</div>
+              <div>按 <span class="kbd">Enter</span>，並輸入 Mac 管理員密碼。</div>
+            </div>
+
+            <div class="step">
+              <div class="num">7</div>
+              <div style="width:100%">
+                嘗試從 <b>應用程式</b> 直接開啟：<br/>
+                <span class="pill">應用程式 → 伊伊經驗小幫手.app → 雙擊</span>
+                <div class="note"><span class="k">若仍無法開啟</span>：再使用下方「替代啟動方式」。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="margin:4px 0 10px">替代啟動方式</h3>
+          <p class="muted">只有在上面步驟完成後，仍無法從「應用程式」啟動時才需要。</p>
+          <ol style="margin:0; padding-left:22px">
+            <li>在 Finder 右鍵 <b>伊伊經驗小幫手.app</b> → <b>顯示套件內容</b>。</li>
+            <li>進入 <code>Contents/MacOS/</code></li>
+            <li><b>雙擊</b> 裡面的執行檔（檔名：<code>伊伊經驗小幫手</code>）。</li>
+          </ol>
+          <div class="note"><span class="k">說明</span>：這是直接啟動執行檔的方式，可能不會顯示完整圖示或拖拉到 Dock，但能確認程式可運作。</div>
+
+          <div class="hr"></div>
+
+          <details>
+            <summary>常見問題</summary>
+            <div style="margin-top:10px">
+              <p><b>Q1. 指令後面一定要空白嗎？</b><br/><span class="muted">是。因為要讓 Finder 拖進去的路徑接在後面。</span></p>
+              <p><b>Q2. 為什麼輸入密碼沒有顯示？</b><br/><span class="muted">macOS 在終端機輸入密碼時不顯示任何字元，直接輸入完成後按 Enter 即可。</span></p>
+              <p><b>Q3. 仍顯示「無法開啟」？</b><br/><span class="muted">請再確認指令是否成功（無錯誤訊息），或至 <i>系統設定 → 隱私權與安全性</i> 檢查右側是否有「仍要打開」按鈕。</span></p>
+            </div>
+          </details>
+        </div>
+      </div>
+
+    <p class="footer">
+      若有任何問題，歡迎於 
+      <a href="https://discord.gg/UJfHxYBgfB" target="_blank" rel="noopener noreferrer">Discord</a> 
+       <a href="https://discord.com/channels/849831182048821299/1383994395262586880" target="_blank" rel="noopener noreferrer">#伊伊經驗秒傷小幫手</a> 回報。
+    </p>
+    </section>
+  </div>
+
+  <script>
+    // 複製指令
+    document.querySelectorAll("[data-copy]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const sel = btn.getAttribute("data-copy");
+        const input = document.querySelector(sel);
+        if(!input) return;
+        input.select();
+        document.execCommand("copy");
+        btn.textContent = "已複製 ✅";
+        setTimeout(()=> btn.textContent = "複製指令", 1500);
+      });
+    });
+  </script>
+</body>
+</html>
