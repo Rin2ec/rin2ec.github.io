@@ -138,12 +138,12 @@ a:hover {
           <div class="steps">
             <div class="step">
               <div class="num">1</div>
-              <div><b>雙擊</b> <code>DMG</code> 檔。</div>
+              <div><b>雙擊</b> <code>DMG</code> 檔</div>
             </div>
 
             <div class="step">
               <div class="num">2</div>
-              <div>把 <code>伊伊經驗小幫手.app</code> 拖曳到 <b>Applications</b>（應用程式）資料夾。</div>
+              <div>把 <code>伊伊經驗小幫手.app</code> 拖曳到 <b>Applications</b>（應用程式）資料夾</div>
             </div>
 
             <div class="step">
@@ -174,8 +174,10 @@ a:hover {
 
             <div class="step">
               <div class="num">6</div>
+              <div style="width:100%">
               <div>按 <span class="kbd">Enter</span>，並輸入 Mac 管理員密碼。</div>
-              <div class="note"><span class="k">提示</span>：密碼輸入時不會顯示字元是正常現象。</div>
+              <div class="note">提示：密碼輸入時不會顯示字元是正常現象。</div>
+                </div>
             </div>
 
             <div class="step">
@@ -197,21 +199,38 @@ a:hover {
             <li>進入 <code>Contents/MacOS/</code></li>
             <li><b>雙擊</b> 裡面的執行檔（檔名：<code>伊伊經驗小幫手</code>）。</li>
           </ol>
-<div class="note">
-  若本機已完成第一次解除隔離（步驟 1～6），
-  之後每次要啟動只需使用這個「替代啟動方式」即可，無須再輸入指令。
-</div>
+          <div class="note">
+            若本機已完成第一次解除隔離（步驟 1～6），
+            之後每次要啟動只需使用這個「替代啟動方式」即可，無須再輸入指令。
+          </div>
           <div class="hr"></div>
 
-          <details>
-            <summary>常見問題</summary>
-            <div style="margin-top:10px">
-              <p><b>Q1. 指令後面一定要空白嗎？</b><br/><span class="muted">是。因為要讓 Finder 拖進去的路徑接在後面。</span></p>
-              <p><b>Q2. 為什麼輸入密碼沒有顯示？</b><br/><span class="muted">macOS 在終端機輸入密碼時不顯示任何字元，直接輸入完成後按 Enter 即可。</span></p>
-              <p><b>Q3. 仍顯示「無法開啟」？</b><br/><span class="muted">請再確認指令是否成功（無錯誤訊息），若有錯誤訊息歡迎提供給我，或至 <i>系統設定 → 隱私權與安全性</i> 檢查右側是否有「仍要打開」按鈕。</span></p>
-              <p><b>Q4. 為甚麼點擊選擇視窗沒有反應？</b><br/><span class="muted">因為要開啟螢幕錄製權限，請到系統設定 → 隱私權與安全性 → 螢幕錄製找到「伊伊經驗小幫手」並勾選，然後重新啟動一次即可選取。</span></p>
-            </div>
-          </details>
+<details open>
+  <summary>常見問題</summary>
+  <div style="margin-top:10px">
+    <p><b>Q1. 指令後面一定要空白嗎？</b><br/>
+      <span class="muted">是。因為要讓 Finder 拖進去的路徑接在後面。</span>
+    </p>
+
+    <p><b>Q2. 為什麼輸入密碼沒有顯示？</b><br/>
+      <span class="muted">macOS 在終端機輸入密碼時不顯示任何字元，直接輸入完成後按 Enter 即可。</span>
+    </p>
+
+    <p><b>Q3. 仍顯示「無法開啟」？</b><br/>
+      <span class="muted">請再確認指令是否成功（無錯誤訊息），若有錯誤訊息歡迎提供給我，或至 <i>系統設定 → 隱私權與安全性</i> 檢查右側是否有「仍要打開」按鈕。</span>
+    </p>
+
+    <p><b>Q4. 為甚麼點擊選擇視窗沒有反應？</b><br/>
+      <span class="muted">
+        因為要開啟螢幕錄製權限，請到 <i>系統設定 → 隱私權與安全性 → 螢幕錄製</i>  
+        找到「終端機」並勾選，然後重新啟動一次即可選取。
+      </span>
+    </p>
+
+    <img src="https://i.meee.com.tw/XH1Kmgn.png" alt="macOS 螢幕錄製權限設定" style="max-width: 480px; border: 1px solid #ccc; border-radius: 6px; margin-top: 8px;">
+  </div>
+</details>
+
         </div>
       </div>
 
