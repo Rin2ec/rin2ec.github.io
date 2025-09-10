@@ -39,11 +39,9 @@
 
   #videoWrap{position:relative;max-height:60vh;overflow:auto;border:1px dashed #374151;border-radius:12px}
   #video{max-width:100%;display:block;object-fit:contain}
-  /* ① 修正：overlay 永遠鋪滿容器，不再用視窗座標 */
   #overlay{position:absolute;left:0;top:0;width:100%;height:100%;cursor:crosshair}
   #cropBox{position:absolute;border:2px solid var(--acc);background:rgba(34,211,238,.15);display:none}
 
-  /* 日誌區塊樣式：統一高度、可滾動 */
   .logStack{display:flex;flex-direction:column;gap:8px}
   .logBox{background:#0b1020;border:1px solid #243044;border-radius:10px;padding:10px;max-height:160px;overflow:auto;white-space:pre-wrap}
   .logTitle{font-size:12px;color:var(--muted);margin:0 0 6px 2px}
@@ -53,39 +51,22 @@
   table{width:100%;border-collapse:collapse}
   td,th{border-bottom:1px solid #2b3549;padding:8px}
 
-  /* 表格排版修正 */
-table { width:100%; border-collapse:collapse; table-layout:fixed; }
-th, td { vertical-align:middle; }
-
-/* ① 預設全部靠左 */
-th, td { text-align:left; }
-
-/* ② 第一欄「狀態」置中、固定寬 */
-th:nth-child(1), td:nth-child(1) { width: 90px; text-align:center; }
-
-/* ③ 第二欄「姓名」給一點固定比例 */
-th:nth-child(2), td:nth-child(2) { width: 18%; }
-
-/* ④ 第三欄「命中內容（OCR）」吃剩餘空間 */
-th:nth-child(3), td:nth-child(3) { width: auto; }
-
-/* ⑤ 第四欄「相似度」靠右、固定寬 */
-th:nth-child(4), td:nth-child(4) { width: 110px; text-align:right; }
-
-/* 讓百分比不抖動（字寬一致）— 可選 */
-td:nth-child(4) { font-variant-numeric: tabular-nums; }
-
+  table { width:100%; border-collapse:collapse; table-layout:fixed; }
+  th, td { vertical-align:middle; text-align:left; }
+  th:nth-child(1), td:nth-child(1) { width: 90px; text-align:center; }
+  th:nth-child(2), td:nth-child(2) { width: 18%; }
+  th:nth-child(3), td:nth-child(3) { width: auto; }
+  th:nth-child(4), td:nth-child(4) { width: 110px; text-align:right; }
+  td:nth-child(4) { font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>到場名單檢查器（遊戲隊伍名單 OCR）</h1>
 
-  <!-- 卡片一：匯入 & 左右排版（左：名單；右：log/ocrRaw） -->
   <div class="card">
     <h2>1️⃣ 匯入報名名單</h2>
 
-    <!-- 操作列 -->
     <div class="row">
       <div class="col" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         <input id="csvInput" type="file" accept=".xlsx,.xls,.csv,.txt" />
@@ -93,25 +74,22 @@ td:nth-child(4) { font-variant-numeric: tabular-nums; }
         <div class="small">或直接把名單貼到左側文字框（每行一個暱稱）。</div>
       </div>
       <div class="col" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
-        <select id="lang">
-          <option value="chi_tra+eng">繁體中文 + 英文（建議）</option>
-          <option value="chi_tra">繁體中文</option>
+        <!-- 固定繁+簡 -->
+        <select id="lang" disabled>
+          <option value="chi_tra+chi_sim" selected>繁體 + 簡體</option>
         </select>
         <input id="threshold" type="number" min="0" max="1" step="0.01" value="0.82" style="width:120px" />
         <label class="small">模糊比對門檻（0~1, 越大越嚴格）</label>
       </div>
     </div>
 
-    <!-- 主要內容：兩欄 -->
     <div class="row" style="margin-top:10px;">
-      <!-- 左欄：貼上名單 -->
       <div class="col">
         <textarea id="manualList" placeholder="可在此貼上名單，每行一人；或使用上方檔案匯入"></textarea>
         <div class="small" id="rosterCount" style="margin-left:0;margin-top:6px">尚未導入名單</div>
         <div class="small" style="margin-left:0;">導入後可在下方結果區查看「已到 / 未到 / 相似」。</div>
       </div>
 
-      <!-- 右欄：Log 與 OCR 原文 -->
       <div class="col">
         <div class="logStack">
           <div>
@@ -123,14 +101,12 @@ td:nth-child(4) { font-variant-numeric: tabular-nums; }
             <pre class="logBox" id="ocrRaw"></pre>
           </div>
         </div>
-        <!-- 截圖預覽（隱藏，用於 OCR） -->
         <canvas id="snap" style="max-width:100%;display:none"></canvas>
         <div class="small" style="margin-left:0;margin-top:6px">截圖完成後會顯示於此區（自動隱藏，OCR 直接讀取）。</div>
       </div>
     </div>
   </div>
 
-  <!-- 卡片二：擷取與框選 -->
   <div class="card">
     <h2>2️⃣ 擷取遊戲畫面並框選名單區</h2>
     <div class="row">
@@ -151,7 +127,6 @@ td:nth-child(4) { font-variant-numeric: tabular-nums; }
     </div>
   </div>
 
-  <!-- 卡片三：結果 -->
   <div class="card">
     <h2>3️⃣ 結果</h2>
     <div class="row">
@@ -171,12 +146,11 @@ td:nth-child(4) { font-variant-numeric: tabular-nums; }
   </div>
 </div>
 
-<!-- 依賴：PapaParse、Tesseract.js（CDN） -->
 <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
 <script src="https://unpkg.com/tesseract.js@5.1.0/dist/tesseract.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
-/* ========== 工具：字元正規化 & 模糊比對 ========== */
+/* ========== 工具：字元正規化 & 模糊比對（保留原版以供他處使用） ========== */
 const toHalfWidth = s => s.replace(/[\uFF01-\uFF5E]/g, ch => String.fromCharCode(ch.charCodeAt(0)-0xFEE0)).replace(/\u3000/g,' ');
 const normalize = s => toHalfWidth((s||'').trim().toLowerCase().replace(/\s+/g,'')).replace(/[^\p{Letter}\p{Number}]+/gu,'');
 function levenshtein(a,b){
@@ -201,6 +175,62 @@ function similarity(a,b){
   return (maxLen - dist) / maxLen;
 }
 
+/* ========== 只取中文用：過濾英數符號，並用中文相似度比對 ========== */
+const onlyHan = s => (String(s||'').match(/\p{Script=Han}+/gu)?.join('')) || '';
+
+function buildChineseLines(words){
+  // 過濾掉低信心與非中文
+  const ws = (words||[])
+    .filter(w => (w?.confidence ?? 0) >= 60)
+    .map(w => ({
+      text: (w.text || '').trim(),
+      y: w.bbox?.y0 ?? 0,
+      x: w.bbox?.x0 ?? 0
+    }))
+    .filter(w => /\p{Script=Han}/u.test(w.text));
+
+  // 依 y 聚類（同一列）
+  const lines = [];
+  const tol = 22; // y 容差（放大後像素）
+  ws.sort((a,b)=> a.y - b.y || a.x - b.x);
+  for (const w of ws){
+    const last = lines[lines.length-1];
+    if (!last || Math.abs(last.y - w.y) > tol){
+      lines.push({ y: w.y, items: [w] });
+    } else {
+      last.items.push(w);
+    }
+  }
+  // 每列依 x 排序、組字串、只取連續中文（≥2字）
+  const out = [];
+  for (const L of lines){
+    L.items.sort((a,b)=>a.x - b.x);
+    const joined = L.items.map(i=>i.text).join('');
+    const han = joined.match(/\p{Script=Han}+/gu) || [];
+    han.forEach(seg => { if (seg.length >= 2) out.push(seg); });
+  }
+  // 去重
+  return Array.from(new Set(out));
+}
+
+function similarityHan(a, b){
+  a = onlyHan(a); b = onlyHan(b);
+  if(!a && !b) return 1;
+  if(!a || !b) return 0;
+  const dist = levenshtein(a, b);
+  const maxLen = Math.max(a.length, b.length);
+  return (maxLen - dist) / maxLen;
+}
+function extractChineseLines(textOrWords) {
+  const raw = Array.isArray(textOrWords) ? textOrWords.join('\n') : String(textOrWords||'');
+  const lines = raw.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  const hanSeq = lines.flatMap(line => {
+    const parts = line.match(/\p{Script=Han}+/gu) || [];
+    return parts.filter(p => p.length >= 2); // 至少兩個字
+  });
+  return Array.from(new Set(hanSeq));
+}
+
 /* ========== 狀態 ========== */
 let roster = []; // {name, aliases:[]}
 let present = [], absent = [], maybe = [];
@@ -219,81 +249,27 @@ document.getElementById('csvInput').addEventListener('change', async (e)=>{
   const file = e.target.files?.[0];
   if (!file) return;
 
-  // 依副檔名決定處理方式
   const ext = (file.name.split('.').pop() || '').toLowerCase();
-
   try {
-    // ───────────────────────────────── TXT：一行一人（第一行就是第一筆） ─────────────────────────────────
     if (ext === 'txt') {
       const text = await file.text();
       const lines = text.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-      // 轉成 {name, aliases: []}
       const rows = lines.map(n => ({ name: n, aliases: [] }));
 
       roster = mergeRoster(roster, rows);
       setRosterInfo();
-      refreshManualListFromRoster();  // 讓 textarea 同步顯示目前名單
+      refreshManualListFromRoster();
       log(`✅ TXT 導入成功：${rows.length} 筆`);
       return;
     }
-
-    // ───────────────────────────────── Excel：.xlsx / .xls ─────────────────────────────────
-    /*
-    if (ext === 'xlsx' || ext === 'xls') {
-      const buf = await file.arrayBuffer();
-      const wb = XLSX.read(buf, { type: 'array' });
-      const sheetName = wb.SheetNames[0];           // 取第一個工作表
-      const ws = wb.Sheets[sheetName];
-
-      // 轉 JSON，保留空白欄位
-      const json = XLSX.utils.sheet_to_json(ws, { defval: '' });
-
-      // 轉為 { name, aliases: [] }；表頭支援：「暱稱 / name / 姓名 / 玩家 / player / player name」
-      const rows = (Array.isArray(json) ? json : []).map((r)=>{
-        // 欄位名正規化：去前後空白、去 BOM、轉小寫
-        const nk = (k)=> String(k||'')
-          .replace(/^\uFEFF/, '')    // 去 BOM
-          .trim()
-          .toLowerCase();
-
-        // 把 r 的 key 正規化到 rr
-        const rr = {};
-        for (const k of Object.keys(r)) rr[nk(k)] = r[k];
-
-        const name = (
-          rr['name'] ?? rr['暱稱'] ?? rr['姓名'] ?? rr['玩家'] ??
-          rr['player'] ?? rr['player name'] ?? ''
-        ).toString().trim();
-
-        const aliasField = ( rr['alias'] ?? rr['別名'] ?? rr['aliases'] ?? rr['暱稱別名'] ?? '' )
-          .toString().trim();
-        const aliases = aliasField
-          ? aliasField.split('|').map(s => s.trim()).filter(Boolean)
-          : [];
-
-        return name ? { name, aliases } : null;
-      }).filter(Boolean);
-
-      roster = mergeRoster(roster, rows);
-      setRosterInfo();
-      refreshManualListFromRoster();  // 讓 textarea 同步顯示目前名單
-      log(`✅ 匯入成功：${rows.length} 筆（工作表：${sheetName}）`);
-      return;
-    }
-
-    */
-
-    // 其他副檔名（不支援）
     log('⚠️ 不支援的檔案格式，請上傳 .xlsx/.xls 或 .txt');
   } catch (err) {
-    log('匯入失敗：' + err);
+    log('匯入失敗：' + (err?.stack || err));
   }
 });
 
-
 function refreshManualListFromRoster() {
   const ta = document.getElementById('manualList');
-  // 只顯示主名稱；若想連別名一起顯示，可改成 `${r.name} | ${r.aliases.join(' | ')}`
   ta.value = roster.map(r => r.name).join('\n');
 }
 
@@ -301,7 +277,7 @@ document.getElementById('btnLoadList').addEventListener('click', ()=>{
   const lines = document.getElementById('manualList').value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
   const rows = lines.map(n=>({name:n, aliases:[]}));
   roster = mergeRoster(roster, rows);
-    refreshManualListFromRoster();   // ← 新增這行（同步回文字框，確保去重後也反映）
+  refreshManualListFromRoster();
   setRosterInfo(); log(`貼上名單導入 ${rows.length} 筆`);
 });
 function mergeRoster(base, add){
@@ -326,7 +302,6 @@ const overlay = document.getElementById('overlay');
 const cropBox = document.getElementById('cropBox');
 let isDragging=false, startX=0, startY=0;
 
-/* ② 修正：overlay 尺寸跟隨 video 可見尺寸 */
 function fitOverlay(){
   overlay.width  = video.clientWidth  || 0;
   overlay.height = video.clientHeight || 0;
@@ -338,7 +313,6 @@ obs.observe(document.getElementById('videoWrap'));
 overlay.addEventListener('mousedown', e=>{
   if(!video.videoWidth) return;
   isDragging=true;
-  /* ③ 修正：用 overlay 的座標系換算滑鼠位置 */
   const r = overlay.getBoundingClientRect();
   startX = e.clientX - r.left;
   startY = e.clientY - r.top;
@@ -359,7 +333,6 @@ window.addEventListener('mouseup', e=>{
   if(!isDragging) return;
   isDragging = false;
 
-  // 顯示尺寸
   const dispW = overlay.width, dispH = overlay.height;
   const vidW = video.videoWidth, vidH = video.videoHeight;
 
@@ -378,14 +351,17 @@ window.addEventListener('mouseup', e=>{
   log(`已選範圍（實際像素）：${selection.x},${selection.y},${selection.w}x${selection.h}`);
 });
 
-
 document.getElementById('btnStart').addEventListener('click', async ()=>{
   try{
-    stream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface:"window" }, audio:false });
+    // 可視需要加 ideal 寬高與低幀率以增清晰度/穩定度
+    stream = await navigator.mediaDevices.getDisplayMedia({
+      video: { displaySurface:"window" },
+      audio:false
+    });
     video.srcObject = stream;
     video.onloadedmetadata = ()=>{ video.play(); fitOverlay(); };
     document.getElementById('btnStop').disabled = false;
-    document.getElementById('btnOCR').disabled = false; // ← 新增
+    document.getElementById('btnOCR').disabled = false;
     overlay.style.display='block';
     log('擷取已啟動。請把遊戲視窗切到你剛選的來源上。');
   }catch(err){ log('擷取被拒或失敗：'+err); }
@@ -398,56 +374,104 @@ document.getElementById('btnStop').addEventListener('click', ()=>{
   log('已停止擷取。');
 });
 
-
 /* ========== 影像前處理（灰階 + 自適應二值） ========== */
-function preprocessCrop(srcCanvas, sel){
+function preprocessCropEnhanced(srcCanvas, sel){
   const {x,y,w,h} = sel || {x:0,y:0,w:srcCanvas.width,h:srcCanvas.height};
-  const out = document.createElement('canvas'); out.width = w; out.height = h;
-  const ctx = out.getContext('2d'); ctx.drawImage(srcCanvas, x,y,w,h, 0,0,w,h);
-  const img = ctx.getImageData(0,0,w,h); const d = img.data;
-  // 灰階
-  for(let i=0;i<d.length;i+=4){
-    const gray = (d[i]*0.299 + d[i+1]*0.587 + d[i+2]*0.114)|0;
-    d[i]=d[i+1]=d[i+2]=gray;
+
+  // ① 裁切
+  const cut = document.createElement('canvas');
+  cut.width = w; cut.height = h;
+  const cg = cut.getContext('2d');
+  cg.imageSmoothingEnabled = false;
+  cg.drawImage(srcCanvas, x,y,w,h, 0,0,w,h);
+
+  // ② 放大 2x（讓筆劃更粗）
+  const scale = 2;
+  const up = document.createElement('canvas');
+  up.width = w*scale; up.height = h*scale;
+  const ug = up.getContext('2d');
+  ug.imageSmoothingEnabled = false;
+  ug.drawImage(cut, 0,0, up.width, up.height);
+
+  // ③ 轉灰階 + 積分影像（供自適應二值）
+  const ctx = up.getContext('2d');
+  const img = ctx.getImageData(0,0,up.width,up.height);
+  const d = img.data;
+  let mean = 0;
+  for (let i=0;i<d.length;i+=4){
+    const g = (d[i]*0.299 + d[i+1]*0.587 + d[i+2]*0.114) | 0;
+    d[i]=d[i+1]=d[i+2]=g; mean+=g;
   }
-  // 自適應二值（局部平均 + C）
-  const win = 15, half = (win/2)|0, C = 8;
-  const W = w, H = h;
+  mean /= (d.length/4);
+
+  const W = up.width, H = up.height;
   const integ = new Uint32Array((W+1)*(H+1));
-  for(let y1=1;y1<=H;y1++){
-    let rowsum=0;
-    for(let x1=1;x1<=W;x1++){
-      const gray = d[((y1-1)*W + (x1-1))*4];
-      rowsum += gray;
-      integ[y1*(W+1)+x1] = integ[(y1-1)*(W+1)+x1] + rowsum;
+  for (let yy=1; yy<=H; yy++){
+    let row=0;
+    for (let xx=1; xx<=W; xx++){
+      const g = d[((yy-1)*W+(xx-1))*4];
+      row += g;
+      integ[yy*(W+1)+xx] = integ[(yy-1)*(W+1)+xx] + row;
     }
   }
-  const outImg = ctx.createImageData(w,h); const od = outImg.data;
-  for(let y2=0;y2<H;y2++){
-    for(let x2=0;x2<W;x2++){
-      const x0 = Math.max(0, x2-half), y0 = Math.max(0, y2-half);
-      const x3 = Math.min(W-1, x2+half), y3 = Math.min(H-1, y2+half);
-      const A = x0, B = y0, Cc = x3, Dd = y3;
-      const sum = integ[(Dd+1)*(W+1)+(Cc+1)] - integ[(B)*(W+1)+(Cc+1)] - integ[(Dd+1)*(W+1)+(A)] + integ[(B)*(W+1)+(A)];
-      const count = (Cc-A+1)*(Dd-B+1);
-      const gray = d[(y2*W+x2)*4];
-      const thresh = (sum/count) - C;
-      const v = gray > thresh ? 255 : 0;
-      const idx = (y2*W+x2)*4; od[idx]=od[idx+1]=od[idx+2]=v; od[idx+3]=255;
+
+  // ④ 自適應二值 + 自動反相（平均越亮越可能黑字白底）
+  const out = ctx.createImageData(W,H), od = out.data;
+  const win=21, half=win>>1, C=8;
+  const invert = mean > 140;
+  for (let y2=0;y2<H;y2++){
+    for (let x2=0;x2<W;x2++){
+      const x0=Math.max(0,x2-half), y0=Math.max(0,y2-half);
+      const x1=Math.min(W-1,x2+half), y1=Math.min(H-1,y2+half);
+      const sum = integ[(y1+1)*(W+1)+(x1+1)] - integ[y0*(W+1)+(x1+1)]
+                - integ[(y1+1)*(W+1)+x0] + integ[y0*(W+1)+x0];
+      const cnt = (x1-x0+1)*(y1-y0+1);
+      const g = d[(y2*W+x2)*4];
+      const v = g > (sum/cnt - C) ? 255 : 0;
+      const bin = invert ? (255 - v) : v;
+      const idx=(y2*W+x2)*4; od[idx]=od[idx+1]=od[idx+2]=bin; od[idx+3]=255;
     }
   }
-  ctx.putImageData(outImg,0,0);
-  return out;
+
+  // ⑤ 輕度膨脹 1px（補齊破字）
+  const o2 = ctx.createImageData(W,H), t=o2.data, s=out.data;
+  for (let y2=0;y2<H;y2++){
+    for (let x2=0;x2<W;x2++){
+      let m=0;
+      for (let yy=y2-1; yy<=y2+1; yy++){
+        for (let xx=x2-1; xx<=x2+1; xx++){
+          if(xx<0||yy<0||xx>=W||yy>=H) continue;
+          m = Math.max(m, s[(yy*W+xx)*4]);
+        }
+      }
+      const idx=(y2*W+x2)*4; t[idx]=t[idx+1]=t[idx+2]=m; t[idx+3]=255;
+    }
+  }
+  ctx.putImageData(o2,0,0);
+  return up;
 }
 
-/* ========== OCR 流程 ========== */
-async function ensureWorker(){
+
+/* ========== OCR 流程（繁+簡 + 黑名單英數符號） ========== */
+async function ensureWorker(forceReload = false){
+  const lang = 'chi_tra+chi_sim';
+  if (worker && forceReload) {
+    try { await worker.terminate(); } catch(e){}
+    worker = null;
+  }
   if(worker) return worker;
-  const lang = document.getElementById('lang').value || 'chi_tra+eng';
   worker = await Tesseract.createWorker(lang, 1, {
     logger: m => { if(m.status==='recognizing text'){ log(`OCR 進度：${Math.round((m.progress||0)*100)}%`); } }
   });
-  log('OCR 語言載入完成：'+lang);
+  await worker.setParameters({
+    tessedit_pageseg_mode: '6',     // 單一區塊、多行
+    user_defined_dpi: '300',
+    preserve_interword_spaces: '1',
+    tessedit_char_blacklist:
+      '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' +
+      '%+-=~.,;:!?/\\|[](){}<>"\'`@#$^&*_，。；：！？、（）［］【】《》〈〉—…·-'
+  });
+  log('OCR 語言與參數載入完成：繁體 + 簡體');
   return worker;
 }
 
@@ -457,6 +481,7 @@ function snapOnce() {
   c.width = video.videoWidth;
   c.height = video.videoHeight;
   const g = c.getContext('2d');
+  g.imageSmoothingEnabled = false; // 保持銳利
   g.drawImage(video, 0, 0);
   log('已拍攝截圖。');
   return true;
@@ -464,41 +489,38 @@ function snapOnce() {
 
 document.getElementById('btnOCR').addEventListener('click', async ()=>{
   try{
-   // 先自動拍照（確保是最新畫面）
     if (!snapOnce()) return;
-    const sel = selection || {x:0,y:0,w:snapCanvas.width,h:snapCanvas.height};
-    const proc = preprocessCrop(snapCanvas, sel);
 
+    // 只取選區上 60%（名字區），避免把下方數字吃進 OCR
+    const sel0 = selection || {x:0,y:0,w:snapCanvas.width,h:snapCanvas.height};
+    const sel = { x: sel0.x, y: sel0.y, w: sel0.w, h: Math.floor(sel0.h * 0.60) };
+
+    const proc = preprocessCropEnhanced(snapCanvas, sel);
     await ensureWorker();
     const t0 = performance.now();
-    const { data } = await worker.recognize(proc);
 
-// 🔹 直接把完整文字塞進預覽框
-const ocrRawEl = document.getElementById('ocrRaw');
-ocrRawEl.textContent = (data.text || '').trim() || '(空白)';
+    const result = await worker.recognize(proc);
+    const { data } = result;
 
-// 🔹 若 data.text 為空，再嘗試用 lines 拼出來（保底）
-if (!ocrRawEl.textContent || ocrRawEl.textContent === '(空白)') {
-  try {
-    const lines = (data.lines || []).map(l => (l.text || '').trim()).filter(Boolean);
-    if (lines.length) ocrRawEl.textContent = lines.join('\n');
-  } catch {}
-}
+    // 原文（除錯）
+    const ocrRawEl = document.getElementById('ocrRaw');
+    ocrRawEl.textContent = (data.text || '').trim() || '(空白)';
 
-// 🔹 同步在 console 看完整物件（方便你排查）
-console.log('Tesseract data =', data);
+    // 依 words 聚類 → 僅保留中文列
+    const lines = buildChineseLines(data.words || []);
+    log('有效中文列數：' + lines.length);
+
     const t1 = performance.now();
-    log(`OCR 完成，用時 ${(t1-t0).toFixed(0)} ms`);
+    log(`OCR 完成，用時 ${(t1 - t0).toFixed(0)} ms`);
 
-    const lines = (data.text||'').split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-    log('OCR 行數：'+lines.length);
     evaluatePresence(lines);
   }catch(err){
-    log('OCR 發生錯誤：'+err);
+    log('OCR 發生錯誤：' + err);
   }
 });
 
-/* ========== 比對決策 ========== */
+
+/* ========== 比對決策（改用 similarityHan） ========== */
 function evaluatePresence(ocrLines){
   const thr = parseFloat(document.getElementById('threshold').value)||0.82;
   present = []; absent = []; maybe = [];
@@ -507,7 +529,7 @@ function evaluatePresence(ocrLines){
   function matchOne(target, candidates){
     let best = { line:'', score:0 };
     for(const c of candidates){
-      const s = similarity(target, c);
+      const s = similarityHan(target, c); // ← 只比中文
       if(s > best.score) best = {line:c, score:s};
       if(s >= 0.999) return {line:c, score:s, early:true};
     }
