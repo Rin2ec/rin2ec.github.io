@@ -58,6 +58,11 @@
   th:nth-child(3), td:nth-child(3) { width: auto; }
   th:nth-child(4), td:nth-child(4) { width: 110px; text-align:right; }
   td:nth-child(4) { font-variant-numeric: tabular-nums; }
+  #videoWrap { position:relative; }
+#overlay   { position:absolute; left:0; top:0; width:100%; height:100%; cursor:crosshair; z-index: 3; }
+#cropBox   { position:absolute; border:2px solid var(--acc); background:rgba(34,211,238,.10); display:none; z-index: 4; }
+/* 可視需要：格線顏色較醒目 */
+.gridline { stroke: rgba(34,211,238,0.95); }
 </style>
 </head>
 <body>
@@ -80,6 +85,12 @@
         </select>
         <input id="threshold" type="number" min="0" max="1" step="0.01" value="0.82" style="width:120px" />
         <label class="small">模糊比對門檻（0~1, 越大越嚴格）</label>
+        <input id="cols" type="number" min="1" max="6" value="5" style="width:70px" />
+<label class="small">欄數</label>
+<input id="rows" type="number" min="1" max="10" value="4" style="width:70px" />
+<label class="small">列數</label>
+<input id="nameRatio" type="number" min="0.4" max="0.9" step="0.01" value="0.5" style="width:90px" />
+<label class="small">姓名區高度比例</label>
       </div>
     </div>
 
@@ -179,7 +190,6 @@ function similarity(a,b){
 const onlyHan = s => (String(s||'').match(/\p{Script=Han}+/gu)?.join('')) || '';
 
 function buildChineseLines(words){
-  // 過濾掉低信心與非中文
   const ws = (words||[])
     .filter(w => (w?.confidence ?? 0) >= 60)
     .map(w => ({
@@ -189,7 +199,6 @@ function buildChineseLines(words){
     }))
     .filter(w => /\p{Script=Han}/u.test(w.text));
 
-  // 依 y 聚類（同一列）
   const lines = [];
   const tol = 22; // y 容差（放大後像素）
   ws.sort((a,b)=> a.y - b.y || a.x - b.x);
@@ -201,7 +210,6 @@ function buildChineseLines(words){
       last.items.push(w);
     }
   }
-  // 每列依 x 排序、組字串、只取連續中文（≥2字）
   const out = [];
   for (const L of lines){
     L.items.sort((a,b)=>a.x - b.x);
@@ -209,9 +217,45 @@ function buildChineseLines(words){
     const han = joined.match(/\p{Script=Han}+/gu) || [];
     han.forEach(seg => { if (seg.length >= 2) out.push(seg); });
   }
-  // 去重
   return Array.from(new Set(out));
 }
+/* 取得 video 顯示在 overlay 上的縮放與偏移（考慮 object-fit: contain 的黑邊） */
+function getVideoMapping() {
+  const vidW = video.videoWidth || 0;
+  const vidH = video.videoHeight || 0;
+  const ow = overlay.width || 1;
+  const oh = overlay.height || 1;
+
+  const scale = Math.min(ow / vidW, oh / vidH) || 1; // 等比縮放，留黑邊
+  const dispW = Math.round(vidW * scale);
+  const dispH = Math.round(vidH * scale);
+  const offsetX = Math.round((ow - dispW) / 2); // 左右黑邊
+  const offsetY = Math.round((oh - dispH) / 2); // 上下黑邊
+  return { vidW, vidH, ow, oh, scale, dispW, dispH, offsetX, offsetY };
+}
+
+/* overlay(顯示) → video(真實像素) 點座標 */
+function overlayPtToVideo(pt) {
+  const m = getVideoMapping();
+  const x = Math.round((pt.x - m.offsetX) / m.scale);
+  const y = Math.round((pt.y - m.offsetY) / m.scale);
+  return {
+    x: Math.max(0, Math.min(m.vidW, x)),
+    y: Math.max(0, Math.min(m.vidH, y))
+  };
+}
+
+/* video(真實像素) → overlay(顯示) 矩形 */
+function videoRectToOverlayRect(r) {
+  const m = getVideoMapping();
+  return {
+    x: Math.round(m.offsetX + r.x * m.scale),
+    y: Math.round(m.offsetY + r.y * m.scale),
+    w: Math.round(r.w * m.scale),
+    h: Math.round(r.h * m.scale)
+  };
+}
+
 
 function similarityHan(a, b){
   a = onlyHan(a); b = onlyHan(b);
@@ -301,55 +345,127 @@ const video = document.getElementById('video');
 const overlay = document.getElementById('overlay');
 const cropBox = document.getElementById('cropBox');
 let isDragging=false, startX=0, startY=0;
+let startOverlayX = 0, startOverlayY = 0;
+let startVideoPt = {x:0,y:0};
 
 function fitOverlay(){
-  overlay.width  = video.clientWidth  || 0;
-  overlay.height = video.clientHeight || 0;
+  const rect = document.getElementById('videoWrap').getBoundingClientRect();
+  // overlay 的 CSS 尺寸 = video 可見尺寸（wrap 內部）
+  overlay.style.width  = rect.width + 'px';
+  overlay.style.height = rect.height + 'px';
+  overlay.width  = Math.round(rect.width);   // 用 CSS 像素當作 canvas 內部座標
+  overlay.height = Math.round(rect.height);
 }
+
+function getVideoMappingCSS() {
+  const vidW = video.videoWidth || 0, vidH = video.videoHeight || 0;
+  const ow = overlay.width || 1, oh = overlay.height || 1;    // CSS px
+  const scale = Math.min(ow/vidW, oh/vidH) || 1;              // contain
+  const dispW = vidW * scale, dispH = vidH * scale;
+  const offsetX = (ow - dispW)/2, offsetY = (oh - dispH)/2;   // 黑邊
+  return { vidW, vidH, ow, oh, scale, dispW, dispH, offsetX, offsetY };
+}
+
+// overlay(CSS) 點 → video(真實像素) 點
+function cssPtToVideo(pt) {
+  const m = getVideoMappingCSS();
+  const x = (pt.x - m.offsetX) / m.scale;
+  const y = (pt.y - m.offsetY) / m.scale;
+  return { x: Math.max(0, Math.min(m.vidW, Math.round(x))),
+           y: Math.max(0, Math.min(m.vidH, Math.round(y))) };
+}
+
+// video 矩形 → overlay(CSS) 矩形（畫格線用）
+function videoRectToCSSRect(r) {
+  const m = getVideoMappingCSS();
+  return {
+    x: Math.round(m.offsetX + r.x * m.scale),
+    y: Math.round(m.offsetY + r.y * m.scale),
+    w: Math.round(r.w * m.scale),
+    h: Math.round(r.h * m.scale)
+  };
+}
+
+window.addEventListener('resize', fitOverlay);
+video.onloadedmetadata = ()=>{ video.play(); fitOverlay(); };
+(new ResizeObserver(fitOverlay)).observe(document.getElementById('videoWrap'));
+
 window.addEventListener('resize', fitOverlay);
 const obs = new ResizeObserver(()=> fitOverlay());
 obs.observe(document.getElementById('videoWrap'));
 
+
 overlay.addEventListener('mousedown', e=>{
   if(!video.videoWidth) return;
-  isDragging=true;
+  isDragging = true;
+
+  // 確保 overlay 尺寸最新
+  fitOverlay();
+
+  // 清掉舊格線（拖曳中不畫格線）
+  overlay.getContext('2d').clearRect(0,0,overlay.width,overlay.height);
+
   const r = overlay.getBoundingClientRect();
-  startX = e.clientX - r.left;
-  startY = e.clientY - r.top;
+  startXcss = e.clientX - r.left;
+  startYcss = e.clientY - r.top;
+
+  // cropBox 預覽（CSS px）
   cropBox.style.display='block';
-  cropBox.style.left = startX+'px';
-  cropBox.style.top = startY+'px';
+  cropBox.style.left = startXcss+'px';
+  cropBox.style.top  = startYcss+'px';
   cropBox.style.width='0px';
   cropBox.style.height='0px';
 });
+
 overlay.addEventListener('mousemove', e=>{
   if(!isDragging) return;
   const r = overlay.getBoundingClientRect();
-  const x = e.clientX - r.left, y = e.clientY - r.top;
-  const w = Math.max(1, x - startX), h = Math.max(1, y - startY);
+  const curX = e.clientX - r.left;
+  const curY = e.clientY - r.top;
+
+  // 歸一化到左上
+  const x0 = Math.min(startXcss, curX);
+  const y0 = Math.min(startYcss, curY);
+  const w  = Math.max(1, Math.abs(curX - startXcss));
+  const h  = Math.max(1, Math.abs(curY - startYcss));
+
+  // 只顯示外框（CSS px）
+  cropBox.style.left = x0+'px'; cropBox.style.top = y0+'px';
   cropBox.style.width = w+'px'; cropBox.style.height = h+'px';
+
+  // 拖曳中不畫格線
+  overlay.getContext('2d').clearRect(0,0,overlay.width,overlay.height);
 });
+
 window.addEventListener('mouseup', e=>{
   if(!isDragging) return;
   isDragging = false;
 
-  const dispW = overlay.width, dispH = overlay.height;
-  const vidW = video.videoWidth, vidH = video.videoHeight;
+  const r = overlay.getBoundingClientRect();
+  const endX = e.clientX - r.left;
+  const endY = e.clientY - r.top;
 
-  const x = parseInt(cropBox.style.left), y = parseInt(cropBox.style.top);
-  const w = parseInt(cropBox.style.width), h = parseInt(cropBox.style.height);
+  // 歸一化（CSS px）
+  const x0 = Math.min(startXcss, endX);
+  const y0 = Math.min(startYcss, endY);
+  const w  = Math.max(1, Math.abs(endX - startXcss));
+  const h  = Math.max(1, Math.abs(endY - startYcss));
 
-  const scaleX = vidW / dispW;
-  const scaleY = vidH / dispH;
+  // 轉成 video 矩形（一次性映射）
+  const p0 = cssPtToVideo({x:x0,     y:y0});
+  const p1 = cssPtToVideo({x:x0 + w, y:y0 + h});
+  selection = { x: p0.x, y: p0.y, w: p1.x - p0.x, h: p1.y - p0.y };
 
-  selection = {
-    x: Math.round(x * scaleX),
-    y: Math.round(y * scaleY),
-    w: Math.round(w * scaleX),
-    h: Math.round(h * scaleY)
-  };
-  log(`已選範圍（實際像素）：${selection.x},${selection.y},${selection.w}x${selection.h}`);
+  // 隱藏外框，畫正式格線（這時用 videoRect→CSSRect 繪製）
+  cropBox.style.display = 'none';
+  const cols = parseInt(document.getElementById('cols')?.value || '5', 10);
+  const rows = parseInt(document.getElementById('rows')?.value || '4', 10);
+  drawGridOverlayVideoRect(selection, cols, rows, true);
+
+  log(`已選範圍（video px）：${selection.x},${selection.y},${selection.w}x${selection.h}`);
 });
+
+
 
 document.getElementById('btnStart').addEventListener('click', async ()=>{
   try{
@@ -378,14 +494,12 @@ document.getElementById('btnStop').addEventListener('click', ()=>{
 function preprocessCropEnhanced(srcCanvas, sel){
   const {x,y,w,h} = sel || {x:0,y:0,w:srcCanvas.width,h:srcCanvas.height};
 
-  // ① 裁切
   const cut = document.createElement('canvas');
   cut.width = w; cut.height = h;
   const cg = cut.getContext('2d');
   cg.imageSmoothingEnabled = false;
   cg.drawImage(srcCanvas, x,y,w,h, 0,0,w,h);
 
-  // ② 放大 2x（讓筆劃更粗）
   const scale = 2;
   const up = document.createElement('canvas');
   up.width = w*scale; up.height = h*scale;
@@ -393,7 +507,6 @@ function preprocessCropEnhanced(srcCanvas, sel){
   ug.imageSmoothingEnabled = false;
   ug.drawImage(cut, 0,0, up.width, up.height);
 
-  // ③ 轉灰階 + 積分影像（供自適應二值）
   const ctx = up.getContext('2d');
   const img = ctx.getImageData(0,0,up.width,up.height);
   const d = img.data;
@@ -415,7 +528,6 @@ function preprocessCropEnhanced(srcCanvas, sel){
     }
   }
 
-  // ④ 自適應二值 + 自動反相（平均越亮越可能黑字白底）
   const out = ctx.createImageData(W,H), od = out.data;
   const win=21, half=win>>1, C=8;
   const invert = mean > 140;
@@ -433,7 +545,6 @@ function preprocessCropEnhanced(srcCanvas, sel){
     }
   }
 
-  // ⑤ 輕度膨脹 1px（補齊破字）
   const o2 = ctx.createImageData(W,H), t=o2.data, s=out.data;
   for (let y2=0;y2<H;y2++){
     for (let x2=0;x2<W;x2++){
@@ -450,7 +561,6 @@ function preprocessCropEnhanced(srcCanvas, sel){
   ctx.putImageData(o2,0,0);
   return up;
 }
-
 
 /* ========== OCR 流程（繁+簡 + 黑名單英數符號） ========== */
 async function ensureWorker(forceReload = false){
@@ -491,33 +601,100 @@ document.getElementById('btnOCR').addEventListener('click', async ()=>{
   try{
     if (!snapOnce()) return;
 
-    // 只取選區上 60%（名字區），避免把下方數字吃進 OCR
-    const sel0 = selection || {x:0,y:0,w:snapCanvas.width,h:snapCanvas.height};
-    const sel = { x: sel0.x, y: sel0.y, w: sel0.w, h: Math.floor(sel0.h * 0.60) };
+    const cols = parseInt(document.getElementById('cols').value || '5', 10);
+    const rows = parseInt(document.getElementById('rows').value || '4', 10);
+    const nameRatio = parseFloat(document.getElementById('nameRatio').value || '0.60');
 
-    const proc = preprocessCropEnhanced(snapCanvas, sel);
+    // 使用者框一次整區
+    const sel0 = selection || {x:0,y:0,w:snapCanvas.width,h:snapCanvas.height};
+    //drawGridOverlay(sel0, cols, rows); // 視覺輔助
+    const cells = makeGridRects(sel0, cols, rows, 4);
+
     await ensureWorker();
     const t0 = performance.now();
 
-    const result = await worker.recognize(proc);
-    const { data } = result;
+    const allNames = [];
+    for (const cell of cells){
+      // 只取每格上方的姓名區
+      const nameRect = cropNameZone(cell, nameRatio);
+      const proc = preprocessCropEnhanced(snapCanvas, nameRect);
+log(`grid cells: ${cells.length}, nameRatio=${nameRatio}`);
+log(`sel0: ${JSON.stringify(sel0)}`);
+      const result = await worker.recognize(proc);
+      const { data } = result;
+      log(`r${cell.row} c${cell.col}  words=${data.words?.length||0}  text="${(data.text||'').slice(0,30)}"`);
 
-    // 原文（除錯）
+      // 以 words 依 y 聚類 → 僅中文
+      const lines = buildChineseLines(data.words || []);
+      // 取每格最合理的一條（長度優先）；也可以改成 all push
+      if (lines.length){
+        const best = lines.sort((a,b)=> b.length - a.length)[0];
+        allNames.push(best);
+      }
+    }
+
+    // 顯示 OCR 原文（合併）
     const ocrRawEl = document.getElementById('ocrRaw');
-    ocrRawEl.textContent = (data.text || '').trim() || '(空白)';
-
-    // 依 words 聚類 → 僅保留中文列
-    const lines = buildChineseLines(data.words || []);
-    log('有效中文列數：' + lines.length);
+    ocrRawEl.textContent = allNames.join('\n') || '(空白)';
 
     const t1 = performance.now();
-    log(`OCR 完成，用時 ${(t1 - t0).toFixed(0)} ms`);
+    log(`逐格 OCR 完成：${allNames.length} 條，用時 ${(t1 - t0).toFixed(0)} ms`);
 
-    evaluatePresence(lines);
+    // 進你的比對流程
+    evaluatePresence(allNames);
   }catch(err){
     log('OCR 發生錯誤：' + err);
   }
 });
+
+
+/* ========== 依框選自動切格 ========== */
+function makeGridRects(sel, cols, rows, pad=4){
+  // sel 是以「實際像素」為單位的 {x,y,w,h}
+  const rects = [];
+  const cw = Math.floor(sel.w / cols);
+  const ch = Math.floor(sel.h / rows);
+  for (let r=0; r<rows; r++){
+    for (let c=0; c<cols; c++){
+      const x = sel.x + c*cw + pad;
+      const y = sel.y + r*ch + pad;
+      const w = (c===cols-1 ? sel.x+sel.w - (sel.x + c*cw) : cw) - pad*2;
+      const h = (r===rows-1 ? sel.y+sel.h - (sel.y + r*ch) : ch) - pad*2;
+      rects.push({x,y,w,h, row:r, col:c});
+    }
+  }
+  return rects;
+}
+
+/* ========== 在 overlay 上畫格線（僅視覺輔助） ========== */
+function drawGridOverlayVideoRect(videoRect, cols, rows, showOuter=true){
+  const ctx = overlay.getContext('2d');
+  ctx.clearRect(0,0,overlay.width,overlay.height);
+
+  const R = videoRectToCSSRect(videoRect); // 先轉成 CSS 座標再畫
+  ctx.strokeStyle = 'rgba(34,211,238,0.95)';
+  ctx.lineWidth = 2;
+  if (showOuter) ctx.strokeRect(R.x, R.y, R.w, R.h);
+
+  const cw = R.w/cols, ch = R.h/rows;
+  ctx.beginPath();
+  for(let i=1;i<cols;i++){
+    const x = Math.round(R.x + i*cw);
+    ctx.moveTo(x, R.y); ctx.lineTo(x, R.y+R.h);
+  }
+  for(let j=1;j<rows;j++){
+    const y = Math.round(R.y + j*ch);
+    ctx.moveTo(R.x, y); ctx.lineTo(R.x+R.w, y);
+  }
+  ctx.stroke();
+}
+
+/* ========== 只取每格「上方姓名區」 ========== */
+function cropNameZone(rect, ratio){
+  const h = Math.max(1, Math.floor(rect.h * ratio));
+  return { x: rect.x, y: rect.y, w: rect.w, h };
+}
+
 
 
 /* ========== 比對決策（改用 similarityHan） ========== */
