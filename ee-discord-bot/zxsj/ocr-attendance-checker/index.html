@@ -80,17 +80,20 @@
       </div>
       <div class="col" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
         <!-- 固定繁+簡 -->
-        <select id="lang" disabled>
+        <select id="lang" style="display:none">
           <option value="chi_tra+chi_sim" selected>繁體 + 簡體</option>
         </select>
         <input id="threshold" type="number" min="0" max="1" step="0.01" value="0.82" style="width:120px" />
         <label class="small">模糊比對門檻（0~1, 越大越嚴格）</label>
-        <input id="cols" type="number" min="1" max="6" value="5" style="width:70px" />
-<label class="small">欄數</label>
-<input id="rows" type="number" min="1" max="10" value="4" style="width:70px" />
-<label class="small">列數</label>
-<input id="nameRatio" type="number" min="0.4" max="0.9" step="0.01" value="0.5" style="width:90px" />
-<label class="small">姓名區高度比例</label>
+    <input id="cols" type="number" min="1" max="6" value="5" style="width:70px;display:none" />
+    <label class="small" style="display:none">欄數</label>
+
+    <input id="rows" type="number" min="1" max="10" value="4" style="width:70px;display:none" />
+    <label class="small" style="display:none">列數</label>
+
+    <input id="nameRatio" type="number" min="0.4" max="0.9" step="0.01" value="0.5" style="width:90px;display:none" />
+    <label class="small" style="display:none">姓名區高度比例</label>
+
       </div>
     </div>
 
