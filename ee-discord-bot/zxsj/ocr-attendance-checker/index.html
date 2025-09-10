@@ -17,7 +17,7 @@
   .card{background:var(--panel);border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.2);margin-bottom:16px}
   h1{font-size:22px;margin:0 0 8px}
   h2{font-size:18px;margin:0 0 8px;color:var(--muted)}
-  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .row{display:flex;gap:28px;flex-wrap:wrap}
   .col{flex:1;min-width:280px}
   .btn{background:#1f2937;border:1px solid #374151;color:#e5e7eb;border-radius:10px;padding:8px 12px;cursor:pointer}
   .btn:hover{border-color:#4b5563}
@@ -26,23 +26,28 @@
   .btn.warn{background:var(--warn);color:#141002;border-color:#d97706}
   .btn.bad{background:var(--bad);color:#140202;border-color:#dc2626}
   input[type="file"],select{background:#111827;border:1px solid #374151;color:#e5e7eb;border-radius:8px;padding:6px 8px}
-  textarea{width:100%;min-height:120px;background:#0b1020;border:1px solid #243044;border-radius:10px;color:#e5e7eb;padding:10px}
-.small {
-  font-size:12px;
-  color:var(--muted);
-  margin-left:14px;
-}
+  textarea{width:100%;min-height:320px;background:#0b1020;border:1px solid #243044;border-radius:10px;color:#e5e7eb;padding:10px}
+
+  .small { font-size:12px; color:var(--muted); margin-left:14px; }
+  .big { font-size:20px; color:var(--muted); margin-left:14px; }
 
   .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;margin-right:6px}
   .tag.good{background:#093815;color:#7cf39a}
   .tag.bad{background:#3a0d0d;color:#ff9b9b}
   .tag.warn{background:#3a2a0d;color:#ffd28a}
+  .tag.warn.ori{background:#093815;color:#7cf39a;margin-right:-5px;font-size:20px}
+
   #videoWrap{position:relative;max-height:60vh;overflow:auto;border:1px dashed #374151;border-radius:12px}
   #video{max-width:100%;display:block;object-fit:contain}
   /* ① 修正：overlay 永遠鋪滿容器，不再用視窗座標 */
   #overlay{position:absolute;left:0;top:0;width:100%;height:100%;cursor:crosshair}
   #cropBox{position:absolute;border:2px solid var(--acc);background:rgba(34,211,238,.15);display:none}
-  pre.log{white-space:pre-wrap;background:#0b1020;border:1px solid #243044;padding:10px;border-radius:10px;max-height:200px;overflow:auto}
+
+  /* 日誌區塊樣式：統一高度、可滾動 */
+  .logStack{display:flex;flex-direction:column;gap:8px}
+  .logBox{background:#0b1020;border:1px solid #243044;border-radius:10px;padding:10px;max-height:160px;overflow:auto;white-space:pre-wrap}
+  .logTitle{font-size:12px;color:var(--muted);margin:0 0 6px 2px}
+
   .list{display:flex;gap:12px;flex-wrap:wrap}
   .pill{background:#0b1020;border:1px solid #243044;border-radius:999px;padding:6px 10px}
   table{width:100%;border-collapse:collapse}
@@ -52,45 +57,67 @@
 <body>
 <div class="wrap">
   <h1>到場名單檢查器（遊戲隊伍名單 OCR）</h1>
+
+  <!-- 卡片一：匯入 & 左右排版（左：名單；右：log/ocrRaw） -->
   <div class="card">
-    <h2>① 匯入報名名單</h2>
+    <h2>1️⃣ 匯入報名名單</h2>
+
+    <!-- 操作列 -->
     <div class="row">
-      <div class="col">
+      <div class="col" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         <input id="csvInput" type="file" accept=".xlsx,.xls,.csv,.txt" />
         <button class="btn primary" id="btnLoadList">導入名單</button>
-        <div class="small">CSV 欄位建議：<code>name</code>（必填）</div>
-        <div class="small">或直接把名單貼到右邊文字框（每行一個暱稱）。</div>
+        <div class="small">或直接把名單貼到左側文字框（每行一個暱稱）。</div>
       </div>
-      <div class="col">
+      <div class="col" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
         <select id="lang">
           <option value="chi_tra+eng">繁體中文 + 英文（建議）</option>
           <option value="chi_tra">繁體中文</option>
-          <option value="eng">英文</option>
         </select>
         <input id="threshold" type="number" min="0" max="1" step="0.01" value="0.82" style="width:120px" />
         <label class="small">模糊比對門檻（0~1, 越大越嚴格）</label>
       </div>
     </div>
-    <div class="row">
-      <div class="col"><textarea id="manualList" placeholder="可在此貼上名單，每行一人；或使用 CSV 匯入"></textarea></div>
+
+    <!-- 主要內容：兩欄 -->
+    <div class="row" style="margin-top:10px;">
+      <!-- 左欄：貼上名單 -->
       <div class="col">
-        <div class="small" id="rosterCount">尚未導入名單</div>
-        <div class="small">導入後可在下方結果區查看「已到 / 未到 / 可疑」。</div>
+        <textarea id="manualList" placeholder="可在此貼上名單，每行一人；或使用上方檔案匯入"></textarea>
+        <div class="small" id="rosterCount" style="margin-left:0;margin-top:6px">尚未導入名單</div>
+        <div class="small" style="margin-left:0;">導入後可在下方結果區查看「已到 / 未到 / 相似」。</div>
+      </div>
+
+      <!-- 右欄：Log 與 OCR 原文 -->
+      <div class="col">
+        <div class="logStack">
+          <div>
+            <div class="logTitle">系統日誌</div>
+            <pre class="logBox" id="log"></pre>
+          </div>
+          <div>
+            <div class="logTitle">OCR 原文</div>
+            <pre class="logBox" id="ocrRaw"></pre>
+          </div>
+        </div>
+        <!-- 截圖預覽（隱藏，用於 OCR） -->
+        <canvas id="snap" style="max-width:100%;display:none"></canvas>
+        <div class="small" style="margin-left:0;margin-top:6px">截圖完成後會顯示於此區（自動隱藏，OCR 直接讀取）。</div>
       </div>
     </div>
   </div>
 
+  <!-- 卡片二：擷取與框選 -->
   <div class="card">
-    <h2>② 擷取遊戲畫面並框選名單區</h2>
+    <h2>2️⃣ 擷取遊戲畫面並框選名單區</h2>
     <div class="row">
       <div class="col">
         <button class="btn" id="btnStart">開始擷取</button>
         <button class="btn" id="btnStop" disabled>停止擷取</button>
-        <button class="btn" id="btnSnap" disabled>拍攝截圖</button>
         <button class="btn warn" id="btnOCR" disabled>OCR 辨識</button>
       </div>
       <div class="col">
-        <span class="tag warn">提示：</span><span class="small">框選遊戲中跨服組隊中的名單。</span>
+        <span class="tag warn ori">提示：</span><span class="big">框選遊戲中跨服組隊中的名單。</span>
       </div>
     </div>
 
@@ -99,19 +126,11 @@
       <canvas id="overlay"></canvas>
       <div id="cropBox"></div>
     </div>
-    <div class="row" style="margin-top:10px;">
-      <div class="col">
-        <canvas id="snap" style="max-width:100%;display:none"></canvas>
-        <div class="small">截圖完成後會顯示於此區（自動隱藏，OCR 直接讀取）。</div>
-      </div>
-      <div class="col">
-        <pre class="log" id="log"></pre>
-      </div>
-    </div>
   </div>
 
+  <!-- 卡片三：結果 -->
   <div class="card">
-    <h2>③ 結果</h2>
+    <h2>3️⃣ 結果</h2>
     <div class="row">
       <div class="col">
         <div class="list" id="tags"></div>
@@ -196,6 +215,7 @@ document.getElementById('csvInput').addEventListener('change', async (e)=>{
     }
 
     // ───────────────────────────────── Excel：.xlsx / .xls ─────────────────────────────────
+    /*
     if (ext === 'xlsx' || ext === 'xls') {
       const buf = await file.arrayBuffer();
       const wb = XLSX.read(buf, { type: 'array' });
@@ -237,6 +257,8 @@ document.getElementById('csvInput').addEventListener('change', async (e)=>{
       log(`✅ 匯入成功：${rows.length} 筆（工作表：${sheetName}）`);
       return;
     }
+
+    */
 
     // 其他副檔名（不支援）
     log('⚠️ 不支援的檔案格式，請上傳 .xlsx/.xls 或 .txt');
@@ -340,7 +362,7 @@ document.getElementById('btnStart').addEventListener('click', async ()=>{
     video.srcObject = stream;
     video.onloadedmetadata = ()=>{ video.play(); fitOverlay(); };
     document.getElementById('btnStop').disabled = false;
-    document.getElementById('btnSnap').disabled = false;
+    document.getElementById('btnOCR').disabled = false; // ← 新增
     overlay.style.display='block';
     log('擷取已啟動。請把遊戲視窗切到你剛選的來源上。');
   }catch(err){ log('擷取被拒或失敗：'+err); }
@@ -349,17 +371,10 @@ document.getElementById('btnStop').addEventListener('click', ()=>{
   if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
   video.srcObject = null; cropBox.style.display='none'; selection=null;
   document.getElementById('btnStop').disabled = true;
-  document.getElementById('btnSnap').disabled = true;
   document.getElementById('btnOCR').disabled = true;
   log('已停止擷取。');
 });
-document.getElementById('btnSnap').addEventListener('click', ()=>{
-  if(!video.videoWidth){ log('尚未開始擷取'); return; }
-  const c = snapCanvas; c.width = video.videoWidth; c.height = video.videoHeight;
-  const g = c.getContext('2d'); g.drawImage(video, 0,0);
-  document.getElementById('btnOCR').disabled = false;
-  log('已拍攝截圖。若尚未框選，請拖曳選取名單區再按 OCR。');
-});
+
 
 /* ========== 影像前處理（灰階 + 自適應二值） ========== */
 function preprocessCrop(srcCanvas, sel){
@@ -413,16 +428,42 @@ async function ensureWorker(){
   return worker;
 }
 
+function snapOnce() {
+  if (!video.videoWidth) { log('尚未開始擷取'); return false; }
+  const c = snapCanvas;
+  c.width = video.videoWidth;
+  c.height = video.videoHeight;
+  const g = c.getContext('2d');
+  g.drawImage(video, 0, 0);
+  log('已拍攝截圖。');
+  return true;
+}
+
 document.getElementById('btnOCR').addEventListener('click', async ()=>{
   try{
-    if(!roster.length){ alert('請先導入報名名單'); return; }
-    if(!snapCanvas.width){ alert('請先拍攝截圖'); return; }
+   // 先自動拍照（確保是最新畫面）
+    if (!snapOnce()) return;
     const sel = selection || {x:0,y:0,w:snapCanvas.width,h:snapCanvas.height};
     const proc = preprocessCrop(snapCanvas, sel);
 
     await ensureWorker();
     const t0 = performance.now();
     const { data } = await worker.recognize(proc);
+
+// 🔹 直接把完整文字塞進預覽框
+const ocrRawEl = document.getElementById('ocrRaw');
+ocrRawEl.textContent = (data.text || '').trim() || '(空白)';
+
+// 🔹 若 data.text 為空，再嘗試用 lines 拼出來（保底）
+if (!ocrRawEl.textContent || ocrRawEl.textContent === '(空白)') {
+  try {
+    const lines = (data.lines || []).map(l => (l.text || '').trim()).filter(Boolean);
+    if (lines.length) ocrRawEl.textContent = lines.join('\n');
+  } catch {}
+}
+
+// 🔹 同步在 console 看完整物件（方便你排查）
+console.log('Tesseract data =', data);
     const t1 = performance.now();
     log(`OCR 完成，用時 ${(t1-t0).toFixed(0)} ms`);
 
@@ -474,12 +515,12 @@ function renderResults(){
   tagsEl.innerHTML = `
     <span class="tag good">已到：${present.length}</span>
     <span class="tag bad">未到：${absent.length}</span>
-    <span class="tag warn">可疑：${maybe.length}</span>
+    <span class="tag warn">相似：${maybe.length}</span>
   `;
   resultTable.innerHTML = '';
   const rows = [
     ...present.map(x=>({status:'已到', cls:'good', ...x})),
-    ...maybe.map(x=>({status:'可疑', cls:'warn', ...x})),
+    ...maybe.map(x=>({status:'相似', cls:'warn', ...x})),
     ...absent.map(x=>({status:'未到', cls:'bad', ...x})),
   ];
   for(const r of rows){
