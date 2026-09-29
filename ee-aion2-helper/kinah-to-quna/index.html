@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>AION2 基納／鑽石成本計算器</title>
 
 <style>
+
 :root{
   --bg:#090d14;
   --card:#111722;
@@ -19,77 +21,98 @@
   --yellow:#ffd166;
 }
 
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
+  padding:24px 16px;
+  min-height:100vh;
   background:linear-gradient(145deg,#080c13,#0d1420);
   color:var(--text);
   font-family:"Segoe UI","Noto Sans TC",sans-serif;
-  min-height:100vh;
-  padding:24px 16px;
 }
 
 .wrap{
-  max-width:1050px;
-  margin:auto;
+  width:100%;
+  max-width:1000px;
+  margin:0 auto;
 }
 
 h1{
-  font-size:25px;
   margin:0 0 6px;
+  font-size:25px;
 }
 
 .sub{
+  margin-bottom:18px;
   color:var(--muted);
   font-size:13px;
-  margin-bottom:18px;
   line-height:1.5;
 }
 
+
+/* =========================
+   主版面
+========================= */
+
 .grid{
   display:grid;
-  grid-template-columns:310px 1fr;
+  grid-template-columns:320px minmax(0,1fr);
   gap:16px;
+  align-items:start;
 }
 
 .card{
+  min-width:0;
+  padding:18px;
   background:rgba(17,23,34,.96);
   border:1px solid var(--line);
   border-radius:14px;
-  padding:18px;
   box-shadow:0 10px 30px rgba(0,0,0,.2);
 }
 
 .title{
+  margin-bottom:14px;
   font-size:16px;
   font-weight:700;
-  margin-bottom:14px;
 }
+
+
+/* =========================
+   輸入區
+========================= */
 
 .section-title{
   display:block;
+  margin:14px 0 7px;
+  color:#b9c4d7;
   font-size:13px;
   font-weight:700;
-  color:#b9c4d7;
-  margin:14px 0 7px;
 }
 
 .input-row{
   display:grid;
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
   gap:8px;
 }
 
+.input-box{
+  min-width:0;
+}
+
 input{
+  display:block;
   width:100%;
+  min-width:0;
+  padding:10px 11px;
   background:#0b111b;
   color:var(--text);
   border:1px solid #354258;
   border-radius:9px;
-  padding:10px 11px;
-  font-size:16px;
   outline:none;
+  font-size:16px;
 }
 
 input:focus{
@@ -98,23 +121,29 @@ input:focus{
 }
 
 .hint{
-  font-size:11px;
-  color:var(--muted);
-  line-height:1.5;
   margin-top:6px;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.5;
 }
+
+
+/* =========================
+   價格輸入
+========================= */
 
 .price-input{
   margin-top:8px;
 }
 
 .custom-row{
-  display:flex;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
   gap:7px;
 }
 
 .custom-row input{
-  flex:1;
+  min-width:0;
 }
 
 button{
@@ -125,6 +154,7 @@ button{
   padding:0 13px;
   cursor:pointer;
   font-size:13px;
+  white-space:nowrap;
 }
 
 button:hover{
@@ -143,17 +173,17 @@ button:hover{
   display:inline-flex;
   align-items:center;
   gap:5px;
+  padding:5px 8px;
   background:#182232;
   border:1px solid #354258;
-  padding:5px 8px;
   border-radius:7px;
   font-size:12px;
 }
 
 .price-tag button{
+  padding:0;
   border:0;
   background:transparent;
-  padding:0;
   color:var(--muted);
   font-size:14px;
 }
@@ -162,9 +192,14 @@ button:hover{
   color:var(--red);
 }
 
+
+/* =========================
+   基本資訊
+========================= */
+
 .base{
   margin-top:14px;
-  padding:11px 12px;
+  padding:10px 12px;
   background:var(--card2);
   border-radius:10px;
   font-size:12px;
@@ -176,39 +211,94 @@ button:hover{
 }
 
 .note{
-  font-size:11px;
-  color:var(--muted);
   margin-top:10px;
+  color:var(--muted);
+  font-size:11px;
   line-height:1.6;
 }
 
+
+/* =========================
+   結果區標題
+========================= */
+
+.result-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.result-header .title{
+  margin:0;
+}
+
+.screenshot-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  padding:7px 11px;
+  background:#1b3552;
+  border:1px solid #3e73a8;
+  color:#dceeff;
+  font-size:12px;
+  font-weight:600;
+}
+
+.screenshot-btn:hover{
+  background:#23476d;
+  border-color:var(--blue);
+}
+
+
+/* =========================
+   報表截圖區
+========================= */
+
+.report-area{
+  padding:0;
+}
+
+
+/* =========================
+   結果表格
+========================= */
+
 .table-wrap{
+  width:100%;
   overflow-x:auto;
 }
 
 table{
-  width:auto;
+  width:max-content;
+  min-width:360px;
   border-collapse:collapse;
   font-size:13px;
 }
 
 th,
 td{
-  padding:10px 14px;
+  padding:10px 12px;
   border-bottom:1px solid var(--line);
-  text-align:right;
   white-space:nowrap;
-}
-
-th:first-child,
-td:first-child{
-  text-align:left;
-  padding-right:28px;
 }
 
 th{
   color:#9eabc0;
   font-weight:500;
+}
+
+th:first-child,
+td:first-child{
+  text-align:left;
+  padding-right:30px;
+}
+
+th:last-child,
+td:last-child{
+  text-align:right;
 }
 
 tr:last-child td{
@@ -219,13 +309,13 @@ tr:last-child td{
   font-weight:700;
 }
 
-.base-cost{
-  color:#ffe29a;
-}
-
 th.base-cost{
   color:var(--yellow);
   font-weight:700;
+}
+
+td.base-cost{
+  color:#ffe29a;
 }
 
 td.base-cost b{
@@ -234,9 +324,9 @@ td.base-cost b{
 }
 
 .percent{
-  font-size:11px;
-  font-weight:500;
   margin-left:3px;
+  color:#b9c4d7;
+  font-size:11px;
   white-space:nowrap;
 }
 
@@ -254,17 +344,43 @@ td.base-cost b{
   color:var(--muted);
 }
 
+
+/* =========================
+   結論
+========================= */
+
 .highlight{
   margin-top:14px;
   padding:12px 13px;
-  border:1px solid #2c5d91;
   background:rgba(30,75,120,.16);
+  border:1px solid #2c5d91;
   border-radius:10px;
-  line-height:1.7;
   font-size:12px;
+  line-height:1.7;
 }
 
-@media(max-width:800px){
+
+/* =========================
+   截圖專用樣式
+========================= */
+
+#captureReport{
+  background:#111722;
+  border-radius:12px;
+  padding:0;
+}
+
+.capture-title{
+  display:none;
+}
+
+
+/* =========================
+   手機版
+========================= */
+
+@media(max-width:760px){
+
   body{
     padding:18px 12px;
   }
@@ -273,35 +389,82 @@ td.base-cost b{
     grid-template-columns:1fr;
   }
 
+  .card{
+    width:100%;
+  }
+
+}
+
+@media(max-width:420px){
+
   .input-row{
     grid-template-columns:1fr 1fr;
   }
+
+  .custom-row{
+    grid-template-columns:minmax(0,1fr) auto;
+  }
+
+  .custom-row button{
+    padding:0 10px;
+  }
+
+  table{
+    min-width:340px;
+  }
+
+  .result-header{
+    align-items:flex-start;
+  }
+
+  .screenshot-btn{
+    padding:7px 9px;
+  }
+
 }
+
 </style>
 </head>
+
 
 <body>
 
 <div class="wrap">
 
-  <h1>💎 AION2 基納／鑽石成本計算器</h1>
+  <h1>
+    💎 AION2 基納／鑽石成本計算器
+  </h1>
 
   <div class="sub">
     輸入幣商 1 億基納價格，自動換算 RMB／TWD，
     並比較不同本服刊登價格的 1000 鑽實際成本。
   </div>
 
+
   <div class="grid">
 
-    <!-- 左側 -->
+
+    <!-- =========================
+         左側：輸入條件
+    ========================== -->
+
     <div class="card">
 
-      <div class="title">💰 輸入條件</div>
+      <div class="title">
+        💰 輸入條件
+      </div>
 
-      <div class="section-title">幣商 1 億基納價格</div>
+
+      <!-- 幣商價格 -->
+
+      <div class="section-title">
+        幣商 1 億基納價格
+      </div>
 
       <div class="input-row">
-        <div>
+
+        <div class="input-box">
+
           <input
             id="rmb"
             type="number"
@@ -310,34 +473,69 @@ td.base-cost b{
             value="60"
             placeholder="RMB"
           >
-          <div class="hint">RMB</div>
+
+          <div class="hint">
+            RMB
+          </div>
+
         </div>
 
-        <div>
+
+        <div class="input-box">
+
           <input
             id="twd"
             type="number"
             min="0"
             step="0.01"
-            value="270"
+            value="282"
             placeholder="TWD"
           >
-          <div class="hint">TWD</div>
+
+          <div class="hint">
+            TWD
+          </div>
+
         </div>
+
+      </div>
+
+
+      <!-- 匯率 -->
+
+      <div class="section-title">
+        💱 RMB／TWD 匯率
+      </div>
+
+      <input
+        id="exchangeRate"
+        type="number"
+        min="0"
+        step="0.01"
+        value="4.7"
+        placeholder="匯率"
+      >
+
+      <div class="hint">
+        1 RMB = 輸入匯率 TWD，修改後會自動重新計算。
+      </div>
+
+
+      <!-- 本服價格 -->
+
+      <div class="section-title">
+        🏷️ 本服刊登價格
       </div>
 
       <div class="hint">
-        匯率 1 RMB = 4.5 TWD，兩者會自動同步。
+        實收鑽數 = 刊登價格 × 90%
       </div>
 
-      <div class="section-title">🏷️ 本服刊登價格</div>
-
-      <div class="hint">
-        實收鑽數為刊登價格 × 90%。
-      </div>
 
       <div class="price-input">
+
         <div class="custom-row">
+
           <input
             id="customPrice"
             type="number"
@@ -345,19 +543,55 @@ td.base-cost b{
             step="1"
             placeholder="輸入價格"
           >
-          <button onclick="addPrice()">＋新增</button>
+
+          <button onclick="addPrice()">
+            ＋新增
+          </button>
+
         </div>
+
       </div>
 
-      <div id="priceTags" class="price-tags"></div>
+
+      <div
+        id="priceTags"
+        class="price-tags"
+      ></div>
+
+
+      <!-- 基本資訊 -->
 
       <div class="base">
-        <div>💳 MyCard：<b>1000 鑽 = 475 元</b></div>
-        <div>🏷️ MyCard 92 折：<b>437.00 元</b></div>
-        <div>💱 匯率：<b>1 RMB = 4.5 TWD</b></div>
-        <div>💰 每次兌換：<b>1,100 萬基納</b></div>
-        <div>📉 本服實收：<b>90%</b></div>
+
+        <div>
+          💳 MyCard：
+          <b>1000 鑽 = 475 元</b>
+        </div>
+
+        <div>
+          🏷️ MyCard 92 折：
+          <b>437.00 元</b>
+        </div>
+
+        <div>
+          💱 匯率：
+          <b id="rateDisplay">
+            1 RMB = 4.70 TWD
+          </b>
+        </div>
+
+        <div>
+          💰 每次兌換：
+          <b>1,100 萬基納</b>
+        </div>
+
+        <div>
+          📉 本服實收：
+          <b>90%</b>
+        </div>
+
       </div>
+
 
       <div class="note">
         ※ 購買基納時，交易所扣除 10% 手續費，實際收到 90%。<br>
@@ -367,29 +601,87 @@ td.base-cost b{
     </div>
 
 
-    <!-- 右側 -->
+    <!-- =========================
+         右側：結果
+    ========================== -->
+
     <div class="card">
 
-      <div class="title">
-        📊 成本比較（1000 鑽）
-      </div>
+      <div class="result-header">
 
-      <div class="table-wrap">
+        <div class="title">
+          📊 成本比較（1000 鑽）
+        </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>本服刊登價格</th>
-              <th class="base-cost">1000 鑽成本</th>
-            </tr>
-          </thead>
-
-          <tbody id="rows"></tbody>
-        </table>
+        <button
+          class="screenshot-btn"
+          onclick="takeScreenshot()"
+        >
+          📸 截圖報表
+        </button>
 
       </div>
 
-      <div class="highlight" id="conclusion"></div>
+
+      <!--
+        這一區就是實際要截圖的報表
+      -->
+
+      <div id="captureReport">
+
+        <div class="capture-title">
+          💎 AION2 基納／鑽石成本報表
+        </div>
+
+
+        <!-- 報表摘要 -->
+
+        <div
+          id="reportSummary"
+          class="base"
+          style="margin-top:0;margin-bottom:14px;"
+        >
+        </div>
+
+
+        <!-- 成本表 -->
+
+        <div class="table-wrap">
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  本服刊登價格
+                </th>
+
+                <th class="base-cost">
+                  1000 鑽成本
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody id="rows"></tbody>
+
+          </table>
+
+        </div>
+
+
+        <!-- 結論 -->
+
+        <div
+          class="highlight"
+          id="conclusion"
+        ></div>
+
+      </div>
 
     </div>
 
@@ -398,10 +690,24 @@ td.base-cost b{
 </div>
 
 
+<!-- html2canvas -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+
 <script>
 
-const RMB_TWD = 4.5;
-const MYCARD = 475 * 0.92;
+/* =========================
+   基本設定
+========================= */
+
+// 預設匯率
+const DEFAULT_EXCHANGE_RATE = 4.7;
+
+// MyCard 原價
+const MYCARD = 475;
+
+// MyCard 92 折
+const MYCARD_DISCOUNT = 0.92;
 
 // 每次兌換需要實際取得 1100 萬基納
 const BGN_PER_EXCHANGE = 0.11;
@@ -409,217 +715,866 @@ const BGN_PER_EXCHANGE = 0.11;
 // 本服刊登後實收 90%
 const RECEIVE_RATE = 0.90;
 
-// 幣商交易所手續費後實際收到 90%
+// 幣商交易所扣除 10%
+// 實際收到 90%
 const KINAH_FEE_RATE = 0.90;
 
-let prices = [120, 130, 140];
+
+// 預設本服價格
+let prices = [120,130,140];
+
+
+/* =========================
+   工具
+========================= */
 
 function money(n){
-  return n.toFixed(2);
+
+  return Number(n).toFixed(2);
+
 }
 
 
-// 與 MyCard 92 折比較
+/* =========================
+   MyCard 92 折
+========================= */
+
+function getMyCardCost(){
+
+  return MYCARD * MYCARD_DISCOUNT;
+
+}
+
+
+/* =========================
+   與 MyCard 比較
+========================= */
+
 function diffText(cost){
 
-  const d = MYCARD - cost;
+  const mycard =
+    getMyCardCost();
+
+  const d =
+    mycard - cost;
+
 
   if(Math.abs(d) < 0.005){
-    return '<span class="neutral">持平</span>';
+
+    return `
+      <span class="neutral">
+        持平
+      </span>
+    `;
+
   }
 
-  return d > 0
-    ? `<span class="good">🟢 省 ${money(d)} 元</span>`
-    : `<span class="bad">🔴 貴 ${money(-d)} 元</span>`;
+
+  if(d > 0){
+
+    return `
+      <span class="good">
+        🟢 省 ${money(d)} 元
+      </span>
+    `;
+
+  }
+
+
+  return `
+    <span class="bad">
+      🔴 貴 ${money(-d)} 元
+    </span>
+  `;
+
 }
 
 
-// 新增價格
+/* =========================
+   新增價格
+========================= */
+
 function addPrice(){
 
-  const input = document.getElementById('customPrice');
-  const price = parseFloat(input.value);
+  const input =
+    document.getElementById(
+      'customPrice'
+    );
 
-  if(!isFinite(price) || price <= 0){
-    alert('請輸入有效的刊登價格');
+  const price =
+    parseFloat(input.value);
+
+
+  if(
+    !isFinite(price) ||
+    price <= 0
+  ){
+
+    alert(
+      '請輸入有效的刊登價格'
+    );
+
     return;
+
   }
+
 
   if(prices.includes(price)){
-    alert('這個價格已經存在');
+
+    alert(
+      '這個價格已經存在'
+    );
+
     return;
+
   }
+
 
   prices.push(price);
-  prices.sort((a,b) => a-b);
 
-  input.value = '';
-
-  renderPriceTags();
-  calculate();
-}
-
-
-// 刪除價格
-function removePrice(price){
-
-  prices = prices.filter(p => p !== price);
-
-  renderPriceTags();
-  calculate();
-}
-
-
-// 顯示價格標籤
-function renderPriceTags(){
-
-  const container = document.getElementById('priceTags');
-
-  container.innerHTML = prices.map(price => {
-
-    const received = price * RECEIVE_RATE;
-
-    return `
-      <div class="price-tag">
-        ${money(price)} → ${money(received)} 鑽
-        <button onclick="removePrice(${price})">×</button>
-      </div>
-    `;
-
-  }).join('');
-}
-
-
-// 主計算
-function calculate(){
-
-  let rmb = parseFloat(
-    document.getElementById('rmb').value
+  prices.sort(
+    (a,b)=>a-b
   );
 
-  if(!isFinite(rmb) || rmb < 0){
-    rmb = 0;
-  }
+  input.value='';
 
 
-  // 1 億基納原始成本
-  const oneHundredM = rmb * RMB_TWD;
+  renderPriceTags();
 
-
-  // 每次實際取得 1100 萬基納
-  // 因為交易所扣除 10%，所以需要購買 1100 / 90%
-  const costPerExchange =
-    oneHundredM * BGN_PER_EXCHANGE / KINAH_FEE_RATE;
-
-
-  const rows = document.getElementById('rows');
-
-
-  // 產生成本比較表
-  rows.innerHTML = prices.map(price => {
-
-    const received =
-      price * RECEIVE_RATE;
-
-    const exchangesFor1000 =
-      1000 / received;
-
-    const baseCost =
-      costPerExchange * exchangesFor1000;
-
-
-    const percent =
-      ((baseCost - MYCARD) / MYCARD * 100);
-
-    const percentText =
-      percent < 0
-        ? `( -${Math.abs(percent).toFixed(1)}% )`
-        : percent > 0
-          ? `( +${percent.toFixed(1)}% )`
-          : `( 0.0% )`;
-
-
-    return `
-      <tr>
-
-        <td class="scheme">
-          💎 ${money(price)}
-        </td>
-
-        <td class="base-cost">
-          <b>${money(baseCost)} 元</b>
-          <span class="percent">${percentText}</span>
-          <br>
-          ${diffText(baseCost)}
-        </td>
-
-      </tr>
-    `;
-
-  }).join('');
-
-
-  // 結論
-  document.getElementById('conclusion').innerHTML =
-    `💡 <b>目前幣商價格：${money(rmb)} RMB / ${money(oneHundredM)} TWD（1 億基納）</b><br>` +
-    `交易所扣除 10% 手續費後，實際收到 <b>90%</b> 基納。<br>` +
-    `實際取得 1 億基納需購買約 ` +
-    `<b>${money(1 / KINAH_FEE_RATE)} 億基納</b>，` +
-    `成本約 <b>${money(oneHundredM / KINAH_FEE_RATE)} TWD</b>。<br>` +
-    `每次實際取得 1,100 萬基納，需購買約 ` +
-    `<b>${money(1100 / KINAH_FEE_RATE)} 萬基納</b>。`;
+  calculate();
 
 }
 
 
-// RMB → TWD
-document.getElementById('rmb').addEventListener('input', function(){
+/* =========================
+   刪除價格
+========================= */
 
-  const rmb = parseFloat(this.value);
+function removePrice(price){
 
-  if(isFinite(rmb)){
-    document.getElementById('twd').value =
-      (rmb * RMB_TWD).toFixed(2);
-  }else{
-    document.getElementById('twd').value = '';
-  }
-
-  calculate();
-
-});
+  prices =
+    prices.filter(
+      p=>p!==price
+    );
 
 
-// TWD → RMB
-document.getElementById('twd').addEventListener('input', function(){
-
-  const twd = parseFloat(this.value);
-
-  if(isFinite(twd)){
-    document.getElementById('rmb').value =
-      (twd / RMB_TWD).toFixed(2);
-  }else{
-    document.getElementById('rmb').value = '';
-  }
+  renderPriceTags();
 
   calculate();
 
-});
+}
 
 
-// Enter 新增價格
+/* =========================
+   顯示價格標籤
+========================= */
+
+function renderPriceTags(){
+
+  const container =
+    document.getElementById(
+      'priceTags'
+    );
+
+
+  container.innerHTML =
+    prices.map(price=>{
+
+      const received =
+        price *
+        RECEIVE_RATE;
+
+
+      return `
+        <div class="price-tag">
+
+          ${money(price)}
+          → ${money(received)} 鑽
+
+          <button
+            onclick="removePrice(${price})"
+            title="刪除"
+          >×</button>
+
+        </div>
+      `;
+
+    }).join('');
+
+}
+
+
+/* =========================
+   主計算
+========================= */
+
+function calculate(){
+
+  /* -----------------------
+     取得 RMB
+  ----------------------- */
+
+  let rmb =
+    parseFloat(
+      document
+        .getElementById('rmb')
+        .value
+    );
+
+
+  if(
+    !isFinite(rmb) ||
+    rmb < 0
+  ){
+
+    rmb = 0;
+
+  }
+
+
+  /* -----------------------
+     取得匯率
+  ----------------------- */
+
+  let exchangeRate =
+    parseFloat(
+      document
+        .getElementById(
+          'exchangeRate'
+        )
+        .value
+    );
+
+
+  if(
+    !isFinite(exchangeRate) ||
+    exchangeRate <= 0
+  ){
+
+    exchangeRate =
+      DEFAULT_EXCHANGE_RATE;
+
+  }
+
+
+  /* -----------------------
+     1 億基納 TWD 成本
+  ----------------------- */
+
+  const oneHundredM =
+    rmb *
+    exchangeRate;
+
+
+  /* -----------------------
+     每次實際取得 1100 萬
+  ----------------------- */
+
+  const costPerExchange =
+    oneHundredM *
+    BGN_PER_EXCHANGE /
+    KINAH_FEE_RATE;
+
+
+  /* -----------------------
+     更新匯率顯示
+  ----------------------- */
+
+  document
+    .getElementById(
+      'rateDisplay'
+    )
+    .textContent =
+      `1 RMB = ${money(exchangeRate)} TWD`;
+
+
+  /* -----------------------
+     更新報表摘要
+  ----------------------- */
+
+  document
+    .getElementById(
+      'reportSummary'
+    )
+    .innerHTML = `
+
+      <div>
+        💰 幣商價格：
+        <b>
+          ${money(rmb)} RMB
+          /
+          ${money(oneHundredM)} TWD
+        </b>
+        （1 億基納）
+      </div>
+
+      <div>
+        💱 匯率：
+        <b>
+          1 RMB = ${money(exchangeRate)} TWD
+        </b>
+      </div>
+
+      <div>
+        📉 交易所手續費：
+        <b>10%</b>
+        ／ 實際收到 <b>90%</b>
+      </div>
+
+    `;
+
+
+  /* -----------------------
+     MyCard
+  ----------------------- */
+
+  const mycard =
+    getMyCardCost();
+
+
+  /* -----------------------
+     產生成本比較表
+  ----------------------- */
+
+  const rows =
+    document.getElementById(
+      'rows'
+    );
+
+
+  rows.innerHTML =
+    prices.map(price=>{
+
+
+      /* 本服實收 */
+
+      const received =
+        price *
+        RECEIVE_RATE;
+
+
+      /* 1000 鑽需要幾次兌換 */
+
+      const exchangesFor1000 =
+        1000 /
+        received;
+
+
+      /* 1000 鑽成本 */
+
+      const baseCost =
+        costPerExchange *
+        exchangesFor1000;
+
+
+      /* 與 MyCard 比較 */
+
+      const percent =
+        (
+          (baseCost - mycard) /
+          mycard
+        ) * 100;
+
+
+      let percentText;
+
+
+      if(percent < 0){
+
+        percentText =
+          `( -${Math.abs(percent).toFixed(1)}% )`;
+
+      }
+      else if(percent > 0){
+
+        percentText =
+          `( +${percent.toFixed(1)}% )`;
+
+      }
+      else{
+
+        percentText =
+          `( 0.0% )`;
+
+      }
+
+
+      return `
+        <tr>
+
+          <td class="scheme">
+            💎 ${money(price)}
+          </td>
+
+          <td class="base-cost">
+
+            <b>
+              ${money(baseCost)} 元
+            </b>
+
+            <span class="percent">
+              ${percentText}
+            </span>
+
+            <br>
+
+            ${diffText(baseCost)}
+
+          </td>
+
+        </tr>
+      `;
+
+    }).join('');
+
+
+  /* -----------------------
+     結論
+  ----------------------- */
+
+  document
+    .getElementById(
+      'conclusion'
+    )
+    .innerHTML =
+
+      `💡 <b>目前幣商價格：` +
+      `${money(rmb)} RMB / ` +
+      `${money(oneHundredM)} TWD` +
+      `（1 億基納）</b><br>` +
+
+      `交易所扣除 10% 手續費後，` +
+      `實際收到 <b>90%</b> 基納。<br>` +
+
+      `實際取得 1 億基納需購買約 ` +
+      `<b>${money(
+        1 / KINAH_FEE_RATE
+      )} 億基納</b>，` +
+
+      `成本約 ` +
+      `<b>${money(
+        oneHundredM /
+        KINAH_FEE_RATE
+      )} TWD</b>。<br>` +
+
+      `每次實際取得 1,100 萬基納，` +
+      `需購買約 ` +
+      `<b>${money(
+        1100 /
+        KINAH_FEE_RATE
+      )} 萬基納</b>。`;
+
+}
+
+
+/* =========================
+   RMB → TWD
+========================= */
+
 document
-  .getElementById('customPrice')
-  .addEventListener('keydown', function(e){
+  .getElementById('rmb')
+  .addEventListener(
+    'input',
+    function(){
 
-    if(e.key === 'Enter'){
-      addPrice();
+      const rmb =
+        parseFloat(
+          this.value
+        );
+
+
+      const rate =
+        parseFloat(
+          document
+            .getElementById(
+              'exchangeRate'
+            )
+            .value
+        );
+
+
+      if(
+        isFinite(rmb) &&
+        isFinite(rate) &&
+        rate > 0
+      ){
+
+        document
+          .getElementById(
+            'twd'
+          )
+          .value =
+            (
+              rmb *
+              rate
+            ).toFixed(2);
+
+      }
+      else{
+
+        document
+          .getElementById(
+            'twd'
+          )
+          .value='';
+
+      }
+
+
+      calculate();
+
     }
+  );
 
-  });
+
+/* =========================
+   TWD → RMB
+========================= */
+
+document
+  .getElementById('twd')
+  .addEventListener(
+    'input',
+    function(){
+
+      const twd =
+        parseFloat(
+          this.value
+        );
 
 
-// 初始畫面
+      const rate =
+        parseFloat(
+          document
+            .getElementById(
+              'exchangeRate'
+            )
+            .value
+        );
+
+
+      if(
+        isFinite(twd) &&
+        isFinite(rate) &&
+        rate > 0
+      ){
+
+        document
+          .getElementById(
+            'rmb'
+          )
+          .value =
+            (
+              twd /
+              rate
+            ).toFixed(2);
+
+      }
+      else{
+
+        document
+          .getElementById(
+            'rmb'
+          )
+          .value='';
+
+      }
+
+
+      calculate();
+
+    }
+  );
+
+
+/* =========================
+   匯率變更
+========================= */
+
+document
+  .getElementById(
+    'exchangeRate'
+  )
+  .addEventListener(
+    'input',
+    function(){
+
+      const rate =
+        parseFloat(this.value);
+
+
+      const rmb =
+        parseFloat(
+          document
+            .getElementById(
+              'rmb'
+            )
+            .value
+        );
+
+
+      if(
+        isFinite(rate) &&
+        rate > 0 &&
+        isFinite(rmb)
+      ){
+
+        document
+          .getElementById(
+            'twd'
+          )
+          .value =
+            (
+              rmb *
+              rate
+            ).toFixed(2);
+
+      }
+
+
+      calculate();
+
+    }
+  );
+
+
+/* =========================
+   Enter 新增價格
+========================= */
+
+document
+  .getElementById(
+    'customPrice'
+  )
+  .addEventListener(
+    'keydown',
+    function(e){
+
+      if(e.key === 'Enter'){
+
+        addPrice();
+
+      }
+
+    }
+  );
+
+
+/* =========================
+   截圖報表
+========================= */
+
+async function takeScreenshot(){
+
+  const report =
+    document.getElementById(
+      'captureReport'
+    );
+
+  const button =
+    document.querySelector(
+      '.screenshot-btn'
+    );
+
+
+  if(
+    typeof html2canvas === 'undefined'
+  ){
+
+    alert(
+      '截圖功能載入失敗，請重新整理頁面後再試。'
+    );
+
+    return;
+
+  }
+
+
+  /* 暫時隱藏按鈕 */
+
+  const originalText =
+    button.innerHTML;
+
+  button.innerHTML =
+    '⏳ 製作中...';
+
+  button.disabled = true;
+
+
+  try{
+
+    const canvas =
+      await html2canvas(
+        report,
+        {
+          backgroundColor:'#111722',
+          scale:2,
+          useCORS:true,
+          logging:false
+        }
+      );
+
+
+    canvas.toBlob(
+      async function(blob){
+
+        if(!blob){
+
+          alert(
+            '截圖產生失敗，請再試一次。'
+          );
+
+          button.innerHTML =
+            originalText;
+
+          button.disabled = false;
+
+          return;
+
+        }
+
+
+        const file =
+          new File(
+            [blob],
+            'AION2-基納鑽石成本報表.png',
+            {
+              type:'image/png'
+            }
+          );
+
+
+        /*
+         * 如果瀏覽器支援分享圖片
+         * 優先開啟系統分享
+         */
+
+        if(
+          navigator.share &&
+          navigator.canShare &&
+          navigator.canShare({
+            files:[file]
+          })
+        ){
+
+          try{
+
+            await navigator.share({
+              files:[file],
+              title:'AION2 基納／鑽石成本報表',
+              text:'AION2 基納／鑽石成本比較'
+            });
+
+          }
+          catch(error){
+
+            /*
+             * 使用者取消分享
+             * 不需要顯示錯誤
+             */
+
+            if(
+              error.name !==
+              'AbortError'
+            ){
+
+              downloadScreenshot(
+                blob
+              );
+
+            }
+
+          }
+
+        }
+        else{
+
+          /*
+           * 不支援分享時
+           * 自動下載 PNG
+           */
+
+          downloadScreenshot(
+            blob
+          );
+
+        }
+
+
+        button.innerHTML =
+          originalText;
+
+        button.disabled = false;
+
+
+      },
+      'image/png'
+    );
+
+  }
+  catch(error){
+
+    console.error(
+      '截圖失敗：',
+      error
+    );
+
+    alert(
+      '截圖失敗，請重新整理頁面後再試。'
+    );
+
+    button.innerHTML =
+      originalText;
+
+    button.disabled = false;
+
+  }
+
+}
+
+
+/* =========================
+   下載截圖
+========================= */
+
+function downloadScreenshot(blob){
+
+  const url =
+    URL.createObjectURL(blob);
+
+
+  const link =
+    document.createElement('a');
+
+  link.href = url;
+
+  link.download =
+    'AION2-基納鑽石成本報表.png';
+
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+
+
+  setTimeout(
+    ()=>{
+      URL.revokeObjectURL(url);
+    },
+    1000
+  );
+
+}
+
+
+/* =========================
+   初始畫面
+========================= */
+
 renderPriceTags();
+
 calculate();
 
 </script>
