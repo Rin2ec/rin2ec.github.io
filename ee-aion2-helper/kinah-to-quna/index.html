@@ -289,6 +289,13 @@
     color:#ffd166;
     font-size:15px;
   }
+
+  .percent{
+    font-size:12px;
+    font-weight:500;
+    margin-left:3px;
+    white-space:nowrap;
+  }
 </style>
 </head>
 
@@ -659,23 +666,26 @@ function calculate(){
           ${money(received)} 鑽
         </td>
 
-        <td class="base-cost">
-          <b>${money(baseCost)} 元</b>
-          <br>
-          ${diffText(baseCost)}
-        </td>
+<td class="base-cost">
+  <b>${money(baseCost)} 元</b>
+  <span class="percent ${baseCost < MYCARD ? 'percent-good' : baseCost > MYCARD ? 'percent-bad' : 'percent-neutral'}">${baseCost < MYCARD ? '( -' : baseCost > MYCARD ? '( +' : '( '}${Math.abs((baseCost - MYCARD) / MYCARD * 100).toFixed(1)}% )</span>
+  <br>
+  ${diffText(baseCost)}
+</td>
 
-        <td>
-          ${money(plus10)} 元
-          <br>
-          ${diffText(plus10)}
-        </td>
+<td>
+  <b>${money(plus10)} 元</b>
+  <span class="percent ${plus10 < MYCARD ? 'percent-good' : plus10 > MYCARD ? 'percent-bad' : 'percent-neutral'}">${plus10 < MYCARD ? '( -' : plus10 > MYCARD ? '( +' : '( '}${Math.abs((plus10 - MYCARD) / MYCARD * 100).toFixed(1)}% )</span>
+  <br>
+  ${diffText(plus10)}
+</td>
 
-        <td>
-          ${money(plus15)} 元
-          <br>
-          ${diffText(plus15)}
-        </td>
+<td>
+  <b>${money(plus15)} 元</b>
+  <span class="percent ${plus15 < MYCARD ? 'percent-good' : plus15 > MYCARD ? 'percent-bad' : 'percent-neutral'}">${plus15 < MYCARD ? '( -' : plus15 > MYCARD ? '( +' : '( '}${Math.abs((plus15 - MYCARD) / MYCARD * 100).toFixed(1)}% )</span>
+  <br>
+  ${diffText(plus15)}
+</td>
 
       </tr>
     `;
