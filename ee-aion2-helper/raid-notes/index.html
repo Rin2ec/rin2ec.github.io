@@ -1,715 +1,2743 @@
+```html
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>AION2｜團隊機制個人紀錄</title>
+
 <style>
 :root{
-  --bg:#090b0f;--panel:#12161b;--panel2:#191e25;--border:#29313b;
-  --text:#edf2f7;--muted:#8995a4;--blue:#4da3ff;--green:#4cdb91;
-  --red:#ff6677;--yellow:#ffd45c;--purple:#b18cff;--ice:#62c9ff;
+  --bg:#090b0f;
+  --panel:#12161b;
+  --panel2:#191e25;
+  --border:#29313b;
+  --text:#edf2f7;
+  --muted:#8995a4;
+
+  --blue:#4da3ff;
+  --green:#4cdb91;
+  --red:#ff6677;
+  --yellow:#ffd45c;
+  --purple:#b18cff;
+  --ice:#62c9ff;
+  --teal:#45d6c4;
 }
+
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI","Microsoft JhengHei",sans-serif}
-.app{max-width:1500px;margin:auto;padding:24px}
-header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px}
-h1{font-size:24px;margin:0}.sub{color:var(--muted);font-size:13px;margin-top:5px}
-.actions,.toolbar{display:flex;gap:8px;flex-wrap:wrap}
-.btn{border:1px solid var(--border);background:var(--panel);color:var(--text);padding:9px 13px;border-radius:9px}
-.btn:hover{background:var(--panel2)}
-.btn.primary{background:#1769aa;border-color:#2384d2}.btn.danger{color:#ff8794}
-.notice{background:#101923;border:1px solid #25415c;color:#b9dbfa;padding:10px 12px;border-radius:9px;font-size:12px;margin-bottom:14px}
-input,select,textarea{width:100%;background:#0e1217;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:9px}
-textarea{min-height:76px;resize:vertical}
-.search{flex:1;min-width:220px}
-.stats{display:flex;gap:10px;flex-wrap:wrap;margin:15px 0}
-.stat{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:9px 14px;color:var(--muted);font-size:13px}
-.stat b{color:var(--text);font-size:18px;margin-right:5px}
 
-/* 副本切換 */
-.raid-tabs{display:flex;gap:8px;margin:16px 0 20px}
-.raid-tab{flex:1;max-width:240px;border:1px solid var(--border);background:#11151a;color:var(--muted);padding:13px 18px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer}
-.raid-tab:hover{background:var(--panel2)}
-.raid-tab.active.saint{background:linear-gradient(135deg,#2a2047,#191528);border-color:#8668d8;color:#d9ccff;box-shadow:0 0 0 1px #4e3b82 inset}
-.raid-tab.active.snow{background:linear-gradient(135deg,#12334a,#101e2a);border-color:#4ba9dc;color:#bde9ff;box-shadow:0 0 0 1px #245a78 inset}
-.raid-tab .emoji{font-size:19px;margin-right:7px}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:system-ui,-apple-system,"Segoe UI","Microsoft JhengHei",sans-serif
+}
 
-/* 分類標題 */
-.category-title{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;border-radius:12px;margin-bottom:10px}
-.category-title.saint{background:linear-gradient(90deg,#211a39,#15131d);border:1px solid #4b3c70}
-.category-title.snow{background:linear-gradient(90deg,#122e41,#111a22);border:1px solid #285b78}
-.ct-name{font-size:17px;font-weight:800}.ct-count{font-size:12px;color:var(--muted)}
-.drag-hint{font-size:11px;color:var(--muted)}
+.app{
+  max-width:1500px;
+  margin:auto;
+  padding:24px
+}
 
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
-.card{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:16px;position:relative}
-.card:hover{border-color:#3c4653}
-.card.dragging{opacity:.35}.card.drag-over{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue) inset}
-.cardtop{display:flex;justify-content:space-between;gap:10px}
-.name{font-size:19px;font-weight:700}.role{color:var(--blue);font-size:12px;margin-top:3px}
-.tags{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
-.tag{padding:4px 9px;border-radius:99px;background:#222832;color:#cbd4df;font-size:12px}
-.tag.red{background:#472027;color:#ff9aa5}.tag.green{background:#183b2b;color:#79e9ad}
-.tag.blue{background:#183552;color:#82c3ff}.tag.yellow{background:#493c18;color:#ffe18b}
-.row{display:grid;grid-template-columns:90px 1fr;gap:8px;padding:8px 0;border-top:1px solid #232830}
-.label{color:var(--muted);font-size:13px}.value{font-size:14px;white-space:pre-wrap}
-.cardactions{display:flex;gap:7px;margin-top:13px}
-.small{padding:6px 9px;font-size:12px}
-.empty{text-align:center;color:var(--muted);padding:60px 20px;border:1px dashed var(--border);border-radius:12px}
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+  margin-bottom:18px
+}
 
-/* 表單 */
-.overlay{display:none;position:fixed;inset:0;background:#000b;z-index:10;padding:20px;overflow:auto}
-.modal{max-width:720px;margin:5vh auto;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px}
-.modal h2{margin-top:0}
-.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.field{margin-bottom:12px}.field.full{grid-column:1/-1}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}
-.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
-.radio-group{display:flex;gap:8px}
-.radio-btn{position:relative;flex:1}
-.radio-btn input{position:absolute;opacity:0}
-.radio-btn label{display:block;text-align:center;padding:10px;border:1px solid var(--border);background:#0e1217;border-radius:9px;cursor:pointer;font-weight:700}
-.radio-btn input:checked+label.saint{background:#2a2047;border-color:#8668d8;color:#d9ccff}
-.radio-btn input:checked+label.snow{background:#12334a;border-color:#4ba9dc;color:#bde9ff}
-.color-group{display:flex;gap:8px}
-.color-btn{position:relative;flex:1}
-.color-btn input{position:absolute;opacity:0}
-.color-btn label{display:block;text-align:center;padding:10px;border:1px solid var(--border);border-radius:9px;background:#0e1217;cursor:pointer}
-.color-btn input:checked+label.red{background:#472027;border-color:#ff6677;color:#ffb4bd}
-.color-btn input:checked+label.green{background:#183b2b;border-color:#4cdb91;color:#9ff1c5}
-.hidden{display:none!important}
+h1{
+  font-size:24px;
+  margin:0
+}
+
+.sub{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:5px
+}
+
+.actions,
+.toolbar{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap
+}
+
+.btn{
+  border:1px solid var(--border);
+  background:var(--panel);
+  color:var(--text);
+  padding:9px 13px;
+  border-radius:9px;
+  cursor:pointer
+}
+
+.btn:hover{
+  background:var(--panel2)
+}
+
+.btn.primary{
+  background:#1769aa;
+  border-color:#2384d2
+}
+
+.btn.danger{
+  color:#ff8794
+}
+
+.notice{
+  background:#101923;
+  border:1px solid #25415c;
+  color:#b9dbfa;
+  padding:10px 12px;
+  border-radius:9px;
+  font-size:12px;
+  margin-bottom:14px
+}
+
+input,
+select,
+textarea{
+  width:100%;
+  background:#0e1217;
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:9px
+}
+
+textarea{
+  min-height:76px;
+  resize:vertical
+}
+
+.search{
+  flex:1;
+  min-width:220px
+}
+
+.stats{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin:15px 0
+}
+
+.stat{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:9px 14px;
+  color:var(--muted);
+  font-size:13px
+}
+
+.stat b{
+  color:var(--text);
+  font-size:18px;
+  margin-right:5px
+}
+
+
+/* =========================
+   副本切換
+========================= */
+
+.raid-tabs{
+  display:flex;
+  gap:8px;
+  margin:16px 0 20px
+}
+
+.raid-tab{
+  flex:1;
+  max-width:240px;
+  border:1px solid var(--border);
+  background:#11151a;
+  color:var(--muted);
+  padding:13px 18px;
+  border-radius:12px;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer
+}
+
+.raid-tab:hover{
+  background:var(--panel2)
+}
+
+.raid-tab.active.saint{
+  background:linear-gradient(135deg,#2a2047,#191528);
+  border-color:#8668d8;
+  color:#d9ccff;
+  box-shadow:0 0 0 1px #4e3b82 inset
+}
+
+.raid-tab.active.snow{
+  background:linear-gradient(135deg,#12334a,#101e2a);
+  border-color:#4ba9dc;
+  color:#bde9ff;
+  box-shadow:0 0 0 1px #245a78 inset
+}
+
+.raid-tab.active.erosion{
+  background:linear-gradient(135deg,#103b38,#102521);
+  border-color:#45d6c4;
+  color:#a9fff3;
+  box-shadow:0 0 0 1px #1f7168 inset
+}
+
+.raid-tab .emoji{
+  font-size:19px;
+  margin-right:7px
+}
+
+
+/* =========================
+   分類標題
+========================= */
+
+.category-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 15px;
+  border-radius:12px;
+  margin-bottom:10px
+}
+
+.category-title.saint{
+  background:linear-gradient(90deg,#211a39,#15131d);
+  border:1px solid #4b3c70
+}
+
+.category-title.snow{
+  background:linear-gradient(90deg,#122e41,#111a22);
+  border:1px solid #285b78
+}
+
+.category-title.erosion{
+  background:linear-gradient(90deg,#103733,#111d1c);
+  border:1px solid #286e66
+}
+
+.ct-name{
+  font-size:17px;
+  font-weight:800
+}
+
+.ct-count{
+  font-size:12px;
+  color:var(--muted)
+}
+
+.drag-hint{
+  font-size:11px;
+  color:var(--muted)
+}
+
+
+/* =========================
+   卡片
+========================= */
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(330px,1fr));
+  gap:14px
+}
+
+.card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:13px;
+  padding:16px;
+  position:relative
+}
+
+.card:hover{
+  border-color:#3c4653
+}
+
+.card.dragging{
+  opacity:.35
+}
+
+.card.drag-over{
+  border-color:var(--blue);
+  box-shadow:0 0 0 1px var(--blue) inset
+}
+
+.cardtop{
+  display:flex;
+  justify-content:space-between;
+  gap:10px
+}
+
+.name{
+  font-size:19px;
+  font-weight:700
+}
+
+.role{
+  color:var(--blue);
+  font-size:12px;
+  margin-top:3px
+}
+
+.tags{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin:12px 0
+}
+
+.tag{
+  padding:4px 9px;
+  border-radius:99px;
+  background:#222832;
+  color:#cbd4df;
+  font-size:12px
+}
+
+.tag.red{
+  background:#472027;
+  color:#ff9aa5
+}
+
+.tag.green{
+  background:#183b2b;
+  color:#79e9ad
+}
+
+.tag.blue{
+  background:#183552;
+  color:#82c3ff
+}
+
+.tag.yellow{
+  background:#493c18;
+  color:#ffe18b
+}
+
+.tag.teal{
+  background:#123b37;
+  color:#7ff4e7
+}
+
+.row{
+  display:grid;
+  grid-template-columns:90px 1fr;
+  gap:8px;
+  padding:8px 0;
+  border-top:1px solid #232830
+}
+
+.label{
+  color:var(--muted);
+  font-size:13px
+}
+
+.value{
+  font-size:14px;
+  white-space:pre-wrap
+}
+
+.cardactions{
+  display:flex;
+  gap:7px;
+  margin-top:13px
+}
+
+.small{
+  padding:6px 9px;
+  font-size:12px
+}
+
+.empty{
+  text-align:center;
+  color:var(--muted);
+  padding:60px 20px;
+  border:1px dashed var(--border);
+  border-radius:12px
+}
+
+
+/* =========================
+   侵蝕圖片
+========================= */
+
+.erosion-image{
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid #232830
+}
+
+.erosion-image-title{
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:8px
+}
+
+.erosion-image img{
+  display:block;
+  width:100%;
+  max-height:500px;
+  object-fit:contain;
+  background:#090b0f;
+  border:1px solid var(--border);
+  border-radius:9px
+}
+
+
+/* =========================
+   表單
+========================= */
+
+.overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:#000b;
+  z-index:10;
+  padding:20px;
+  overflow:auto
+}
+
+.modal{
+  max-width:720px;
+  margin:5vh auto;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:20px
+}
+
+.modal h2{
+  margin-top:0
+}
+
+.formgrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px
+}
+
+.field{
+  margin-bottom:12px
+}
+
+.field.full{
+  grid-column:1/-1
+}
+
+.field label{
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:5px
+}
+
+.modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:16px
+}
+
+.radio-group{
+  display:flex;
+  gap:8px
+}
+
+.radio-btn{
+  position:relative;
+  flex:1
+}
+
+.radio-btn input{
+  position:absolute;
+  opacity:0
+}
+
+.radio-btn label{
+  display:block;
+  text-align:center;
+  padding:10px;
+  border:1px solid var(--border);
+  background:#0e1217;
+  border-radius:9px;
+  cursor:pointer;
+  font-weight:700
+}
+
+.radio-btn input:checked+label.saint{
+  background:#2a2047;
+  border-color:#8668d8;
+  color:#d9ccff
+}
+
+.radio-btn input:checked+label.snow{
+  background:#12334a;
+  border-color:#4ba9dc;
+  color:#bde9ff
+}
+
+.radio-btn input:checked+label.erosion{
+  background:#103b38;
+  border-color:#45d6c4;
+  color:#a9fff3
+}
+
+.color-group{
+  display:flex;
+  gap:8px
+}
+
+.color-btn{
+  position:relative;
+  flex:1
+}
+
+.color-btn input{
+  position:absolute;
+  opacity:0
+}
+
+.color-btn label{
+  display:block;
+  text-align:center;
+  padding:10px;
+  border:1px solid var(--border);
+  border-radius:9px;
+  background:#0e1217;
+  cursor:pointer
+}
+
+.color-btn input:checked+label.red{
+  background:#472027;
+  border-color:#ff6677;
+  color:#ffb4bd
+}
+
+.color-btn input:checked+label.green{
+  background:#183b2b;
+  border-color:#4cdb91;
+  color:#9ff1c5
+}
+
+
+/* =========================
+   侵蝕炸彈站位選擇
+========================= */
+
+.bomb-group{
+  display:flex;
+  gap:8px
+}
+
+.bomb-btn{
+  position:relative;
+  flex:1
+}
+
+.bomb-btn input{
+  position:absolute;
+  opacity:0
+}
+
+.bomb-btn label{
+  display:block;
+  text-align:center;
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:9px;
+  background:#0e1217;
+  cursor:pointer;
+  font-size:15px;
+  font-weight:700
+}
+
+.bomb-btn input:checked+label{
+  background:#103b38;
+  border-color:#45d6c4;
+  color:#a9fff3;
+  box-shadow:0 0 0 1px #286e66 inset
+}
+
+.bomb-preview{
+  margin-top:12px;
+  padding:12px;
+  background:#0c1114;
+  border:1px solid var(--border);
+  border-radius:10px;
+  text-align:center
+}
+
+.bomb-preview-title{
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:8px
+}
+
+.bomb-preview img{
+  max-width:100%;
+  max-height:420px;
+  border-radius:8px;
+  object-fit:contain;
+  display:block;
+  margin:auto
+}
+
+.hidden{
+  display:none!important
+}
+
+
+/* =========================
+   RWD
+========================= */
+
 @media(max-width:700px){
- .app{padding:14px}header{align-items:flex-start;flex-direction:column}
- .formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}
- .grid{grid-template-columns:1fr}.raid-tabs{position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 0}
+
+  .app{
+    padding:14px
+  }
+
+  header{
+    align-items:flex-start;
+    flex-direction:column
+  }
+
+  .formgrid{
+    grid-template-columns:1fr
+  }
+
+  .field.full{
+    grid-column:auto
+  }
+
+  .grid{
+    grid-template-columns:1fr
+  }
+
+  .raid-tabs{
+    position:sticky;
+    top:0;
+    z-index:5;
+    background:var(--bg);
+    padding:8px 0
+  }
+
+  .raid-tab{
+    padding:11px 8px;
+    font-size:13px
+  }
+
+  .raid-tab .emoji{
+    margin-right:3px
+  }
 }
 </style>
 </head>
+
 <body>
+
 <div class="app">
+
 <header>
+
   <div>
     <h1>⚔️ AION2｜團隊機制個人紀錄</h1>
-    <div class="sub">資料只儲存在目前瀏覽器，可匯出 JSON 備份。</div>
+    <div class="sub">
+      資料只儲存在目前瀏覽器，可匯出 JSON 備份。
+    </div>
   </div>
+
   <div class="actions">
-    <button class="btn primary" onclick="openModal()">＋ 新增紀錄</button>
-    <button class="btn" onclick="exportData()">⬇ 匯出</button>
-    <button class="btn" onclick="document.getElementById('importFile').click()">⬆ 匯入</button>
-    <input id="importFile" type="file" accept=".json" hidden onchange="importData(event)">
+    <button class="btn primary" onclick="openModal()">
+      ＋ 新增紀錄
+    </button>
+
+    <button class="btn" onclick="exportData()">
+      ⬇ 匯出
+    </button>
+
+    <button class="btn"
+            onclick="document.getElementById('importFile').click()">
+      ⬆ 匯入
+    </button>
+
+    <input
+      id="importFile"
+      type="file"
+      accept=".json"
+      hidden
+      onchange="importData(event)"
+    >
   </div>
+
 </header>
 
-<div class="notice">💡 拖曳卡片可調整順序。副本現在採「單一分類」，上方按鈕可快速切換聖杯／雪原。</div>
+
+<div class="notice">
+  💡 拖曳卡片可調整順序。副本採「單一分類」，上方按鈕可快速切換聖杯／雪原／侵蝕。
+</div>
+
+
+<!-- =========================
+     副本切換
+========================= -->
 
 <div class="raid-tabs">
-  <button id="tab-all" class="raid-tab active" onclick="setRaid('all')">📚 全部</button>
-  <button id="tab-saint" class="raid-tab saint" onclick="setRaid('聖杯')"><span class="emoji">🏆</span>聖杯</button>
-  <button id="tab-snow" class="raid-tab snow" onclick="setRaid('雪原')"><span class="emoji">❄️</span>雪原</button>
+
+  <button
+    id="tab-all"
+    class="raid-tab active"
+    onclick="setRaid('all')">
+    📚 全部
+  </button>
+
+  <button
+    id="tab-saint"
+    class="raid-tab saint"
+    onclick="setRaid('聖杯')">
+    <span class="emoji">🏆</span>聖杯
+  </button>
+
+  <button
+    id="tab-snow"
+    class="raid-tab snow"
+    onclick="setRaid('雪原')">
+    <span class="emoji">❄️</span>雪原
+  </button>
+
+  <button
+    id="tab-erosion"
+    class="raid-tab erosion"
+    onclick="setRaid('侵蝕')">
+    <span class="emoji">🧪</span>侵蝕
+  </button>
+
 </div>
+
 
 <div class="toolbar">
-  <input class="search" id="search" placeholder="搜尋暱稱、職業、踢球、波浪打法、水晶站位…" oninput="render()">
-  <select id="roleFilter" onchange="render()"><option value="">全部職業</option></select>
+
+  <input
+    class="search"
+    id="search"
+    placeholder="搜尋暱稱、職業、踢球、波浪打法、炸彈站位…"
+    oninput="render()"
+  >
+
+  <select
+    id="roleFilter"
+    onchange="render()">
+
+    <option value="">全部職業</option>
+
+  </select>
+
 </div>
+
 
 <div class="stats" id="stats"></div>
+
 <div id="content"></div>
+
 </div>
+
+
+<!-- =========================
+     新增 / 編輯
+========================= -->
 
 <div class="overlay" id="overlay">
+
 <div class="modal">
-  <h2 id="modalTitle">新增紀錄</h2>
+
+  <h2 id="modalTitle">
+    新增紀錄
+  </h2>
+
 
   <div class="formgrid">
+
+    <!-- 副本 -->
+
     <div class="field full">
+
       <label>副本 *</label>
+
       <div class="radio-group">
-        <div class="radio-btn"><input type="radio" name="category" id="catSaint" value="聖杯"><label class="saint" for="catSaint">🏆 聖杯</label></div>
-        <div class="radio-btn"><input type="radio" name="category" id="catSnow" value="雪原"><label class="snow" for="catSnow">❄️ 雪原</label></div>
-      </div>
-    </div>
 
-    <div class="field"><label>暱稱 *</label><input id="f_name"></div>
-    <div class="field"><label>職業 *</label>
-      <select id="f_role">
-        <option value="">請選擇職業</option>
-        <option>守護星</option><option>劍星</option><option>殺星</option>
-        <option>弓星</option><option>魔道星</option><option>精靈星</option>
-        <option>治癒星</option><option>護法星</option><option>拳星</option>
-      </select>
-    </div>
+        <div class="radio-btn">
 
-    <div id="saintFields" class="field full">
-      <div class="field"><label>吃球顏色（單選）</label>
-        <div class="color-group">
-          <div class="color-btn"><input type="radio" name="eatColor" id="eatRed" value="紅色"><label class="red" for="eatRed">🔴 紅色</label></div>
-          <div class="color-btn"><input type="radio" name="eatColor" id="eatGreen" value="綠色"><label class="green" for="eatGreen">🟢 綠色</label></div>
+          <input
+            type="radio"
+            name="category"
+            id="catSaint"
+            value="聖杯"
+          >
+
+          <label
+            class="saint"
+            for="catSaint">
+            🏆 聖杯
+          </label>
+
         </div>
+
+
+        <div class="radio-btn">
+
+          <input
+            type="radio"
+            name="category"
+            id="catSnow"
+            value="雪原"
+          >
+
+          <label
+            class="snow"
+            for="catSnow">
+            ❄️ 雪原
+          </label>
+
+        </div>
+
+
+        <div class="radio-btn">
+
+          <input
+            type="radio"
+            name="category"
+            id="catErosion"
+            value="侵蝕"
+          >
+
+          <label
+            class="erosion"
+            for="catErosion">
+            🧪 侵蝕
+          </label>
+
+        </div>
+
       </div>
-      <div class="field"><label>踢球</label><textarea id="f_kick" placeholder="例如：6點鐘、12點往9點、紅球往東邊"></textarea></div>
-      <div class="field"><label>炸線</label><textarea id="f_bomb" placeholder="例如：6點鐘｜12點鐘｜藍中央"></textarea></div>
-      <div class="field"><label>慈悲站位</label><input id="f_position" placeholder="例如：3號、左到右、右到左"></div>
-      <div class="field"><label>其他備註</label><input id="f_note" placeholder="特殊注意事項"></div>
+
     </div>
 
-    <div id="snowFields" class="field full hidden">
-      <div class="field"><label>波浪打法</label><input id="f_wave" placeholder="例如：4411、5221、左浪右拉、左拉右浪"></div>
-      <div class="field"><label>水晶站位</label><input id="f_crystal" placeholder="自行填寫，例如：8號、藍左、東邊"></div>
+
+    <!-- 暱稱 -->
+
+    <div class="field">
+
+      <label>暱稱 *</label>
+
+      <input id="f_name">
+
     </div>
+
+
+    <!-- 職業 -->
+
+    <div class="field">
+
+      <label>職業 *</label>
+
+      <select id="f_role">
+
+        <option value="">
+          請選擇職業
+        </option>
+
+        <option>守護星</option>
+        <option>劍星</option>
+        <option>殺星</option>
+        <option>弓星</option>
+        <option>魔道星</option>
+        <option>精靈星</option>
+        <option>治癒星</option>
+        <option>護法星</option>
+        <option>拳星</option>
+
+      </select>
+
+    </div>
+
+
+    <!-- =====================
+         聖杯
+    ====================== -->
+
+    <div
+      id="saintFields"
+      class="field full">
+
+      <div class="field">
+
+        <label>
+          吃球顏色（單選）
+        </label>
+
+        <div class="color-group">
+
+          <div class="color-btn">
+
+            <input
+              type="radio"
+              name="eatColor"
+              id="eatRed"
+              value="紅色"
+            >
+
+            <label
+              class="red"
+              for="eatRed">
+              🔴 紅色
+            </label>
+
+          </div>
+
+
+          <div class="color-btn">
+
+            <input
+              type="radio"
+              name="eatColor"
+              id="eatGreen"
+              value="綠色"
+            >
+
+            <label
+              class="green"
+              for="eatGreen">
+              🟢 綠色
+            </label>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="field">
+
+        <label>踢球</label>
+
+        <textarea
+          id="f_kick"
+          placeholder="例如：6點鐘、12點往9點、紅球往東邊">
+        </textarea>
+
+      </div>
+
+
+      <div class="field">
+
+        <label>炸線</label>
+
+        <textarea
+          id="f_bomb"
+          placeholder="例如：6點鐘｜12點鐘｜藍中央">
+        </textarea>
+
+      </div>
+
+
+      <div class="field">
+
+        <label>慈悲站位</label>
+
+        <input
+          id="f_position"
+          placeholder="例如：3號、左到右、右到左"
+        >
+
+      </div>
+
+
+      <div class="field">
+
+        <label>其他備註</label>
+
+        <input
+          id="f_note"
+          placeholder="特殊注意事項"
+        >
+
+      </div>
+
+    </div>
+
+
+    <!-- =====================
+         雪原
+    ====================== -->
+
+    <div
+      id="snowFields"
+      class="field full hidden">
+
+      <div class="field">
+
+        <label>波浪打法</label>
+
+        <input
+          id="f_wave"
+          placeholder="例如：4411、5221、左浪右拉、左拉右浪"
+        >
+
+      </div>
+
+
+      <div class="field">
+
+        <label>水晶站位</label>
+
+        <input
+          id="f_crystal"
+          placeholder="自行填寫，例如：8號、藍左、東邊"
+        >
+
+      </div>
+
+    </div>
+
+
+    <!-- =====================
+         侵蝕
+    ====================== -->
+
+    <div
+      id="erosionFields"
+      class="field full hidden">
+
+      <div class="field">
+
+        <label>炸彈站位 *</label>
+
+        <div class="bomb-group">
+
+          <div class="bomb-btn">
+
+            <input
+              type="radio"
+              name="bombPosition"
+              id="bomb148"
+              value="148"
+            >
+
+            <label for="bomb148">
+              💣 148
+            </label>
+
+          </div>
+
+
+          <div class="bomb-btn">
+
+            <input
+              type="radio"
+              name="bombPosition"
+              id="bomb184"
+              value="184"
+            >
+
+            <label for="bomb184">
+              💣 184
+            </label>
+
+          </div>
+
+        </div>
+
+
+        <!-- 圖片預覽 -->
+
+        <div
+          id="bombPreview"
+          class="bomb-preview hidden">
+
+          <div class="bomb-preview-title">
+            炸彈站位示意圖
+          </div>
+
+          <img
+            id="bombPreviewImage"
+            src=""
+            alt="炸彈站位示意圖"
+          >
+
+        </div>
+
+      </div>
+
+    </div>
+
   </div>
+
 
   <div class="modal-actions">
-    <button class="btn" onclick="closeModal()">取消</button>
-    <button class="btn primary" onclick="saveRecord()">儲存</button>
+
+    <button
+      class="btn"
+      onclick="closeModal()">
+      取消
+    </button>
+
+    <button
+      class="btn primary"
+      onclick="saveRecord()">
+      儲存
+    </button>
+
   </div>
+
 </div>
+
 </div>
+
 
 <script>
-const KEY='aion2_mechanic_notes_v3';
+
+const KEY='aion2_mechanic_notes_v4';
+
 
 const roles=[
-  '守護星','劍星','殺星','弓星','魔道星',
-  '精靈星','治癒星','護法星','拳星'
+  '守護星',
+  '劍星',
+  '殺星',
+  '弓星',
+  '魔道星',
+  '精靈星',
+  '治癒星',
+  '護法星',
+  '拳星'
 ];
 
-let records=[], currentRaid='all', editId=null;
+
+let records=[];
+let currentRaid='all';
+let editId=null;
+
+
+/* =========================
+   載入
+========================= */
 
 function load(){
+
   try{
-    records=JSON.parse(localStorage.getItem(KEY))||[];
+
+    records=
+      JSON.parse(
+        localStorage.getItem(KEY)
+      )||[];
+
   }catch(e){
+
     records=[];
+
   }
 
-  records=records.map(x=>normalize(x));
+
+  records=
+    records.map(x=>normalize(x));
+
   save();
+
   render();
+
 }
+
+
+/* =========================
+   資料格式
+========================= */
 
 function normalize(x){
+
   return {
+
     ...x,
-    id:x.id||crypto.randomUUID(),
-    category:x.category==='雪原'?'雪原':'聖杯',
+
+    id:
+      x.id||
+      crypto.randomUUID(),
+
+    category:
+      ['聖杯','雪原','侵蝕']
+        .includes(x.category)
+        ?x.category
+        :'聖杯',
+
     role:x.role||'',
+
     eatColor:x.eatColor||'',
+
     wave:x.wave||'',
+
     crystal:x.crystal||'',
+
     kick:x.kick||'',
+
     bomb:x.bomb||'',
+
     position:x.position||'',
-    note:x.note||''
+
+    note:x.note||'',
+
+    bombPosition:
+      x.bombPosition||''
+
   };
+
 }
+
+
+/* =========================
+   儲存
+========================= */
 
 function save(){
-  localStorage.setItem(KEY,JSON.stringify(records));
+
+  localStorage.setItem(
+    KEY,
+    JSON.stringify(records)
+  );
+
 }
+
+
+/* =========================
+   HTML Escape
+========================= */
 
 function esc(s){
-  return String(s??'').replace(/[&<>"']/g,m=>({
-    '&':'&amp;',
-    '<':'&lt;',
-    '>':'&gt;',
-    '"':'&quot;',
-    "'":'&#39;'
-  }[m]));
+
+  return String(s??'')
+    .replace(/[&<>"']/g,m=>({
+
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      '"':'&quot;',
+      "'":'&#39;'
+
+    }[m]));
+
 }
+
+
+/* =========================
+   顏色標籤
+========================= */
 
 function colorTag(c){
+
   return c==='紅色'
-    ? '<span class="tag red">🔴 紅色</span>'
-    : c==='綠色'
-    ? '<span class="tag green">🟢 綠色</span>'
-    : '';
+
+    ?'<span class="tag red">🔴 紅色</span>'
+
+    :c==='綠色'
+
+    ?'<span class="tag green">🟢 綠色</span>'
+
+    :'';
+
 }
 
-function setRaid(raid){
-  currentRaid=raid;
 
-  document.querySelectorAll('.raid-tab')
-    .forEach(x=>x.classList.remove('active'));
+/* =========================
+   炸彈站位標籤
+========================= */
 
-  document.getElementById(
-    raid==='all'
-      ? 'tab-all'
-      : raid==='聖杯'
-      ? 'tab-saint'
-      : 'tab-snow'
-  ).classList.add('active');
+function bombTag(position){
 
-  render();
-}
+  if(!position)
+    return '';
 
-function render(){
-  const q=document.getElementById('search').value.trim().toLowerCase();
-  const rf=document.getElementById('roleFilter').value;
-
-  document.getElementById('roleFilter').innerHTML=
-    '<option value="">全部職業</option>'+
-    roles.map(x=>`<option ${x===rf?'selected':''}>${x}</option>`).join('');
-
-  const list=records.filter(x=>{
-    const text=Object.values(x).join(' ').toLowerCase();
-
-    return (!q||text.includes(q)) &&
-           (!rf||x.role===rf) &&
-           (currentRaid==='all'||x.category===currentRaid);
-  });
-
-  const saintCount=records.filter(x=>x.category==='聖杯').length;
-  const snowCount=records.filter(x=>x.category==='雪原').length;
-
-  document.getElementById('stats').innerHTML=`
-    <div class="stat"><b>${records.length}</b> 筆紀錄</div>
-    <div class="stat">🏆 <b>${saintCount}</b> 聖杯</div>
-    <div class="stat">❄️ <b>${snowCount}</b> 雪原</div>
+  return `
+    <span class="tag teal">
+      💣 ${esc(position)}
+    </span>
   `;
 
-  const content=document.getElementById('content');
-
-  if(!list.length){
-    content.innerHTML=`
-      <div class="empty">
-        目前沒有紀錄<br>
-        <span style="font-size:12px">
-          點擊「＋ 新增紀錄」開始建立團隊機制資料
-        </span>
-      </div>
-    `;
-    return;
-  }
-
-  const groups=[...new Set(list.map(x=>x.category))];
-
-  content.innerHTML=groups.map(cat=>{
-    const arr=list.filter(x=>x.category===cat);
-    const cls=cat==='雪原'?'snow':'saint';
-
-    return `
-      <section>
-        <div class="category-title ${cls}">
-          <div class="ct-name">
-            ${cat==='雪原'?'❄️':'🏆'} ${cat}
-            <span class="ct-count">${arr.length} 筆</span>
-          </div>
-
-          <div class="drag-hint">
-            ☰ 拖曳卡片調整順序
-          </div>
-        </div>
-
-        <div class="grid category-grid" data-category="${cat}">
-          ${arr.map(card).join('')}
-        </div>
-      </section>
-    `;
-  }).join('');
-
-  setupDrag();
 }
 
-function card(x){
-  if(x.category==='雪原'){
-    return `
-      <div class="card" draggable="true" data-id="${x.id}">
-        <div class="cardtop">
-          <div>
-            <div class="name">☰ ${esc(x.name)}</div>
-            <div class="role">
-              ${esc(x.role||'未設定職業')}
+
+/* =========================
+   切換副本
+========================= */
+
+function setRaid(raid){
+
+  currentRaid=raid;
+
+
+  document
+    .querySelectorAll('.raid-tab')
+    .forEach(x=>{
+      x.classList.remove('active');
+    });
+
+
+  const id=
+    raid==='all'
+      ?'tab-all'
+      :raid==='聖杯'
+      ?'tab-saint'
+      :raid==='雪原'
+      ?'tab-snow'
+      :'tab-erosion';
+
+
+  document
+    .getElementById(id)
+    .classList.add('active');
+
+
+  render();
+
+}
+
+
+/* =========================
+   Render
+========================= */
+
+function render(){
+
+  const q=
+    document
+      .getElementById('search')
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const rf=
+    document
+      .getElementById('roleFilter')
+      .value;
+
+
+  document
+    .getElementById('roleFilter')
+    .innerHTML=
+
+      '<option value="">全部職業</option>'+
+
+      roles
+        .map(x=>
+          `<option ${x===rf?'selected':''}>
+            ${x}
+          </option>`
+        )
+        .join('');
+
+
+  const list=
+    records.filter(x=>{
+
+      const text=
+        Object
+          .values(x)
+          .join(' ')
+          .toLowerCase();
+
+
+      return (
+
+        (!q||text.includes(q))&&
+
+        (!rf||x.role===rf)&&
+
+        (
+          currentRaid==='all'||
+          x.category===currentRaid
+        )
+
+      );
+
+    });
+
+
+  const saintCount=
+    records.filter(
+      x=>x.category==='聖杯'
+    ).length;
+
+
+  const snowCount=
+    records.filter(
+      x=>x.category==='雪原'
+    ).length;
+
+
+  const erosionCount=
+    records.filter(
+      x=>x.category==='侵蝕'
+    ).length;
+
+
+  document
+    .getElementById('stats')
+    .innerHTML=`
+
+      <div class="stat">
+        <b>${records.length}</b>
+        筆紀錄
+      </div>
+
+      <div class="stat">
+        🏆 <b>${saintCount}</b>
+        聖杯
+      </div>
+
+      <div class="stat">
+        ❄️ <b>${snowCount}</b>
+        雪原
+      </div>
+
+      <div class="stat">
+        🧪 <b>${erosionCount}</b>
+        侵蝕
+      </div>
+
+    `;
+
+
+  const content=
+    document.getElementById('content');
+
+
+  if(!list.length){
+
+    content.innerHTML=`
+
+      <div class="empty">
+
+        目前沒有紀錄
+
+        <br>
+
+        <span style="font-size:12px">
+
+          點擊「＋ 新增紀錄」
+          開始建立團隊機制資料
+
+        </span>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  const groups=
+    [...new Set(
+      list.map(x=>x.category)
+    )];
+
+
+  content.innerHTML=
+
+    groups.map(cat=>{
+
+      const arr=
+        list.filter(
+          x=>x.category===cat
+        );
+
+
+      const cls=
+        cat==='雪原'
+          ?'snow'
+          :cat==='侵蝕'
+          ?'erosion'
+          :'saint';
+
+
+      const icon=
+        cat==='雪原'
+          ?'❄️'
+          :cat==='侵蝕'
+          ?'🧪'
+          :'🏆';
+
+
+      return `
+
+        <section>
+
+          <div class="category-title ${cls}">
+
+            <div class="ct-name">
+
+              ${icon}
+              ${cat}
+
+              <span class="ct-count">
+                ${arr.length} 筆
+              </span>
+
             </div>
+
+            <div class="drag-hint">
+              ☰ 拖曳卡片調整順序
+            </div>
+
           </div>
+
+
+          <div
+            class="grid category-grid"
+            data-category="${cat}">
+
+            ${arr.map(card).join('')}
+
+          </div>
+
+        </section>
+
+      `;
+
+    }).join('');
+
+
+  setupDrag();
+
+}
+
+
+/* =========================
+   卡片
+========================= */
+
+function card(x){
+
+
+  /* ===== 侵蝕 ===== */
+
+  if(x.category==='侵蝕'){
+
+    return `
+
+      <div
+        class="card"
+        draggable="true"
+        data-id="${x.id}">
+
+        <div class="cardtop">
+
+          <div>
+
+            <div class="name">
+              ☰ ${esc(x.name)}
+            </div>
+
+            <div class="role">
+              ${esc(
+                x.role||
+                '未設定職業'
+              )}
+            </div>
+
+          </div>
+
         </div>
 
-        ${x.wave?`
-          <div class="row">
-            <div class="label">🌊 波浪打法</div>
-            <div class="value">${esc(x.wave)}</div>
-          </div>
-        `:''}
 
-        ${x.crystal?`
-          <div class="row">
-            <div class="label">💎 水晶站位</div>
-            <div class="value">${esc(x.crystal)}</div>
-          </div>
-        `:''}
+        <div class="tags">
+
+          ${bombTag(x.bombPosition)}
+
+        </div>
+
+
+        ${
+          x.bombPosition
+          ?`
+
+            <div class="erosion-image">
+
+              <div class="erosion-image-title">
+                💣 炸彈站位 ${esc(x.bombPosition)}
+              </div>
+
+              <img
+                src="${getBombImage(x.bombPosition)}"
+                alt="炸彈站位 ${esc(x.bombPosition)}"
+                onerror="this.style.display='none'"
+              >
+
+            </div>
+
+          `
+          :''
+        }
+
 
         <div class="cardactions">
-          <button class="btn small"
-                  onclick="editRecord('${x.id}')">
+
+          <button
+            class="btn small"
+            onclick="editRecord('${x.id}')">
             編輯
           </button>
 
-          <button class="btn small"
-                  onclick="duplicateRecord('${x.id}')">
+          <button
+            class="btn small"
+            onclick="duplicateRecord('${x.id}')">
             複製
           </button>
 
-          <button class="btn small danger"
-                  onclick="deleteRecord('${x.id}')">
+          <button
+            class="btn small danger"
+            onclick="deleteRecord('${x.id}')">
             刪除
           </button>
+
         </div>
+
       </div>
+
     `;
+
   }
 
-  return `
-    <div class="card" draggable="true" data-id="${x.id}">
-      <div class="cardtop">
-        <div>
-          <div class="name">☰ ${esc(x.name)}</div>
-          <div class="role">
-            ${esc(x.role||'未設定職業')}
+
+  /* ===== 雪原 ===== */
+
+  if(x.category==='雪原'){
+
+    return `
+
+      <div
+        class="card"
+        draggable="true"
+        data-id="${x.id}">
+
+        <div class="cardtop">
+
+          <div>
+
+            <div class="name">
+              ☰ ${esc(x.name)}
+            </div>
+
+            <div class="role">
+              ${esc(
+                x.role||
+                '未設定職業'
+              )}
+            </div>
+
           </div>
+
         </div>
+
+
+        ${
+          x.wave
+          ?`
+
+            <div class="row">
+
+              <div class="label">
+                🌊 波浪打法
+              </div>
+
+              <div class="value">
+                ${esc(x.wave)}
+              </div>
+
+            </div>
+
+          `
+          :''
+        }
+
+
+        ${
+          x.crystal
+          ?`
+
+            <div class="row">
+
+              <div class="label">
+                💎 水晶站位
+              </div>
+
+              <div class="value">
+                ${esc(x.crystal)}
+              </div>
+
+            </div>
+
+          `
+          :''
+        }
+
+
+        <div class="cardactions">
+
+          <button
+            class="btn small"
+            onclick="editRecord('${x.id}')">
+            編輯
+          </button>
+
+          <button
+            class="btn small"
+            onclick="duplicateRecord('${x.id}')">
+            複製
+          </button>
+
+          <button
+            class="btn small danger"
+            onclick="deleteRecord('${x.id}')">
+            刪除
+          </button>
+
+        </div>
+
       </div>
+
+    `;
+
+  }
+
+
+  /* ===== 聖杯 ===== */
+
+  return `
+
+    <div
+      class="card"
+      draggable="true"
+      data-id="${x.id}">
+
+      <div class="cardtop">
+
+        <div>
+
+          <div class="name">
+            ☰ ${esc(x.name)}
+          </div>
+
+          <div class="role">
+            ${esc(
+              x.role||
+              '未設定職業'
+            )}
+          </div>
+
+        </div>
+
+      </div>
+
 
       <div class="tags">
+
         ${colorTag(x.eatColor)}
+
       </div>
 
-      ${x.kick?`
-        <div class="row">
-          <div class="label">⚽ 踢球</div>
-          <div class="value">${esc(x.kick)}</div>
-        </div>
-      `:''}
 
-      ${x.bomb?`
-        <div class="row">
-          <div class="label">💥 炸線</div>
-          <div class="value">${esc(x.bomb)}</div>
-        </div>
-      `:''}
+      ${
+        x.kick
+        ?`
 
-      ${x.position?`
-        <div class="row">
-          <div class="label">📍 慈悲站位</div>
-          <div class="value">${esc(x.position)}</div>
-        </div>
-      `:''}
+          <div class="row">
 
-      ${x.note?`
-        <div class="row">
-          <div class="label">📝 備註</div>
-          <div class="value">${esc(x.note)}</div>
-        </div>
-      `:''}
+            <div class="label">
+              ⚽ 踢球
+            </div>
+
+            <div class="value">
+              ${esc(x.kick)}
+            </div>
+
+          </div>
+
+        `
+        :''
+      }
+
+
+      ${
+        x.bomb
+        ?`
+
+          <div class="row">
+
+            <div class="label">
+              💥 炸線
+            </div>
+
+            <div class="value">
+              ${esc(x.bomb)}
+            </div>
+
+          </div>
+
+        `
+        :''
+      }
+
+
+      ${
+        x.position
+        ?`
+
+          <div class="row">
+
+            <div class="label">
+              📍 慈悲站位
+            </div>
+
+            <div class="value">
+              ${esc(x.position)}
+            </div>
+
+          </div>
+
+        `
+        :''
+      }
+
+
+      ${
+        x.note
+        ?`
+
+          <div class="row">
+
+            <div class="label">
+              📝 備註
+            </div>
+
+            <div class="value">
+              ${esc(x.note)}
+            </div>
+
+          </div>
+
+        `
+        :''
+      }
+
 
       <div class="cardactions">
-        <button class="btn small"
-                onclick="editRecord('${x.id}')">
+
+        <button
+          class="btn small"
+          onclick="editRecord('${x.id}')">
           編輯
         </button>
 
-        <button class="btn small"
-                onclick="duplicateRecord('${x.id}')">
+        <button
+          class="btn small"
+          onclick="duplicateRecord('${x.id}')">
           複製
         </button>
 
-        <button class="btn small danger"
-                onclick="deleteRecord('${x.id}')">
+        <button
+          class="btn small danger"
+          onclick="deleteRecord('${x.id}')">
           刪除
         </button>
+
       </div>
+
     </div>
+
   `;
+
 }
+
+
+/* =========================
+   炸彈圖片
+========================= */
+
+function getBombImage(position){
+
+  if(position==='148')
+    return '侵蝕_148.png';
+
+  if(position==='184')
+    return '侵蝕_184.png';
+
+  return '';
+
+}
+
+
+/* =========================
+   Drag
+========================= */
 
 function setupDrag(){
-  document.querySelectorAll('.category-grid .card').forEach(card=>{
 
-    card.addEventListener('dragstart',e=>{
-      e.dataTransfer.setData('text/plain',card.dataset.id);
-      card.classList.add('dragging');
+  document
+    .querySelectorAll('.category-grid .card')
+    .forEach(card=>{
+
+      card.addEventListener(
+        'dragstart',
+        e=>{
+
+          e.dataTransfer.setData(
+            'text/plain',
+            card.dataset.id
+          );
+
+          card.classList.add(
+            'dragging'
+          );
+
+        }
+      );
+
+
+      card.addEventListener(
+        'dragend',
+        ()=>{
+          card.classList.remove(
+            'dragging'
+          );
+        }
+      );
+
+
+      card.addEventListener(
+        'dragover',
+        e=>{
+
+          e.preventDefault();
+
+          card.classList.add(
+            'drag-over'
+          );
+
+        }
+      );
+
+
+      card.addEventListener(
+        'dragleave',
+        ()=>{
+          card.classList.remove(
+            'drag-over'
+          );
+        }
+      );
+
+
+      card.addEventListener(
+        'drop',
+        e=>{
+
+          e.preventDefault();
+
+          card.classList.remove(
+            'drag-over'
+          );
+
+
+          const fromId=
+            e.dataTransfer.getData(
+              'text/plain'
+            );
+
+          const toId=
+            card.dataset.id;
+
+
+          if(fromId===toId)
+            return;
+
+
+          const a=
+            records.findIndex(
+              x=>x.id===fromId
+            );
+
+          const b=
+            records.findIndex(
+              x=>x.id===toId
+            );
+
+
+          if(
+            a<0||
+            b<0||
+            records[a].category!==records[b].category
+          )
+            return;
+
+
+          const [m]=
+            records.splice(a,1);
+
+
+          const newB=
+            records.findIndex(
+              x=>x.id===toId
+            );
+
+
+          records.splice(
+            newB,
+            0,
+            m
+          );
+
+
+          save();
+
+          render();
+
+        }
+      );
+
     });
 
-    card.addEventListener('dragend',()=>{
-      card.classList.remove('dragging');
-    });
-
-    card.addEventListener('dragover',e=>{
-      e.preventDefault();
-      card.classList.add('drag-over');
-    });
-
-    card.addEventListener('dragleave',()=>{
-      card.classList.remove('drag-over');
-    });
-
-    card.addEventListener('drop',e=>{
-      e.preventDefault();
-      card.classList.remove('drag-over');
-
-      const fromId=e.dataTransfer.getData('text/plain');
-      const toId=card.dataset.id;
-
-      if(fromId===toId)return;
-
-      const a=records.findIndex(x=>x.id===fromId);
-      const b=records.findIndex(x=>x.id===toId);
-
-      if(
-        a<0||
-        b<0||
-        records[a].category!==records[b].category
-      )return;
-
-      const [m]=records.splice(a,1);
-      const newB=records.findIndex(x=>x.id===toId);
-
-      records.splice(newB,0,m);
-
-      save();
-      render();
-    });
-  });
 }
 
+
+/* =========================
+   開啟表單
+========================= */
+
 function openModal(id=null){
+
   editId=id;
 
-  document.getElementById('modalTitle').textContent=
-    id?'編輯紀錄':'新增紀錄';
 
-  const x=id
-    ?records.find(r=>r.id===id)
-    :{
-      category:
-        currentRaid==='all'
-          ?'聖杯'
-          :currentRaid
-    };
+  document
+    .getElementById('modalTitle')
+    .textContent=
+      id
+        ?'編輯紀錄'
+        :'新增紀錄';
 
-  document.getElementById(
-    x.category==='雪原'
-      ?'catSnow'
-      :'catSaint'
-  ).checked=true;
 
-  document.getElementById('f_name').value=x.name||'';
-  document.getElementById('f_role').value=x.role||'';
+  const x=
+    id
+      ?records.find(
+          r=>r.id===id
+        )
+      :{
+        category:
+          currentRaid==='all'
+            ?'聖杯'
+            :currentRaid
+      };
 
-  document.getElementById('f_wave').value=x.wave||'';
-  document.getElementById('f_crystal').value=x.crystal||'';
 
-  document.getElementById('f_kick').value=x.kick||'';
-  document.getElementById('f_bomb').value=x.bomb||'';
-  document.getElementById('f_position').value=x.position||'';
-  document.getElementById('f_note').value=x.note||'';
+  document
+    .getElementById(
+      x.category==='雪原'
+        ?'catSnow'
+        :x.category==='侵蝕'
+        ?'catErosion'
+        :'catSaint'
+    )
+    .checked=true;
 
-  document.querySelectorAll('input[name=eatColor]')
+
+  document
+    .getElementById('f_name')
+    .value=
+      x.name||'';
+
+
+  document
+    .getElementById('f_role')
+    .value=
+      x.role||'';
+
+
+  document
+    .getElementById('f_wave')
+    .value=
+      x.wave||'';
+
+
+  document
+    .getElementById('f_crystal')
+    .value=
+      x.crystal||'';
+
+
+  document
+    .getElementById('f_kick')
+    .value=
+      x.kick||'';
+
+
+  document
+    .getElementById('f_bomb')
+    .value=
+      x.bomb||'';
+
+
+  document
+    .getElementById('f_position')
+    .value=
+      x.position||'';
+
+
+  document
+    .getElementById('f_note')
+    .value=
+      x.note||'';
+
+
+  document
+    .querySelectorAll(
+      'input[name=eatColor]'
+    )
     .forEach(r=>{
-      r.checked=r.value===(x.eatColor||'');
+
+      r.checked=
+        r.value===
+        (x.eatColor||'');
+
     });
+
+
+  document
+    .querySelectorAll(
+      'input[name=bombPosition]'
+    )
+    .forEach(r=>{
+
+      r.checked=
+        r.value===
+        (x.bombPosition||'');
+
+    });
+
 
   toggleFields();
 
-  document.getElementById('overlay').style.display='block';
-  document.getElementById('f_name').focus();
+  updateBombPreview();
+
+
+  document
+    .getElementById('overlay')
+    .style.display='block';
+
+
+  document
+    .getElementById('f_name')
+    .focus();
+
 }
+
+
+/* =========================
+   表單欄位切換
+========================= */
 
 function toggleFields(){
+
   const cat=
-    document.querySelector(
-      'input[name=category]:checked'
-    )?.value;
-
-  document.getElementById('saintFields')
-    .classList.toggle('hidden',cat!=='聖杯');
-
-  document.getElementById('snowFields')
-    .classList.toggle('hidden',cat!=='雪原');
-}
-
-document.querySelectorAll('input[name=category]')
-  .forEach(r=>r.addEventListener('change',toggleFields));
-
-function closeModal(){
-  document.getElementById('overlay').style.display='none';
-}
-
-function saveRecord(){
-  const category=
-    document.querySelector(
-      'input[name=category]:checked'
-    )?.value;
-
-  const name=
-    document.getElementById('f_name').value.trim();
-
-  const role=
-    document.getElementById('f_role').value;
-
-  if(!category||!name||!role){
-    alert('請完成：副本、暱稱、職業');
-    return;
-  }
-
-  const x=normalize({
-    id:editId||crypto.randomUUID(),
-    category,
-    name,
-    role,
-
-    eatColor:
-      document.querySelector(
-        'input[name=eatColor]:checked'
-      )?.value||'',
-
-    wave:
-      document.getElementById('f_wave')
-        .value.trim(),
-
-    crystal:
-      document.getElementById('f_crystal')
-        .value.trim(),
-
-    kick:
-      document.getElementById('f_kick')
-        .value.trim(),
-
-    bomb:
-      document.getElementById('f_bomb')
-        .value.trim(),
-
-    position:
-      document.getElementById('f_position')
-        .value.trim(),
-
-    note:
-      document.getElementById('f_note')
-        .value.trim()
-  });
-
-  if(editId){
-    Object.assign(
-      records.find(r=>r.id===editId),
-      x
-    );
-  }else{
-    records.push(x);
-  }
-
-  save();
-  closeModal();
-  render();
-}
-
-function editRecord(id){
-  openModal(id);
-}
-
-function duplicateRecord(id){
-  const x=records.find(r=>r.id===id);
-
-  records.push({
-    ...x,
-    id:crypto.randomUUID(),
-    name:x.name+'（副本）'
-  });
-
-  save();
-  render();
-}
-
-function deleteRecord(id){
-  const x=records.find(r=>r.id===id);
-
-  if(confirm(`確定刪除「${x.name}」？`)){
-    records=records.filter(r=>r.id!==id);
-    save();
-    render();
-  }
-}
-
-function exportData(){
-  const blob=new Blob(
-    [
-      JSON.stringify(
-        {
-          version:3,
-          exportedAt:new Date().toISOString(),
-          records
-        },
-        null,
-        2
+    document
+      .querySelector(
+        'input[name=category]:checked'
       )
-    ],
-    {type:'application/json'}
+      ?.value;
+
+
+  document
+    .getElementById('saintFields')
+    .classList.toggle(
+      'hidden',
+      cat!=='聖杯'
+    );
+
+
+  document
+    .getElementById('snowFields')
+    .classList.toggle(
+      'hidden',
+      cat!=='雪原'
+    );
+
+
+  document
+    .getElementById('erosionFields')
+    .classList.toggle(
+      'hidden',
+      cat!=='侵蝕'
+    );
+
+}
+
+
+document
+  .querySelectorAll(
+    'input[name=category]'
+  )
+  .forEach(r=>
+    r.addEventListener(
+      'change',
+      ()=>{
+        toggleFields();
+        updateBombPreview();
+      }
+    )
   );
 
-  const a=document.createElement('a');
 
-  a.href=URL.createObjectURL(blob);
-  a.download='AION2_團隊機制紀錄.json';
-  a.click();
+/* =========================
+   炸彈圖片預覽
+========================= */
 
-  URL.revokeObjectURL(a.href);
-}
+function updateBombPreview(){
 
-function importData(e){
-  const file=e.target.files[0];
+  const cat=
+    document
+      .querySelector(
+        'input[name=category]:checked'
+      )
+      ?.value;
 
-  if(!file)return;
 
-  const reader=new FileReader();
+  const position=
+    document
+      .querySelector(
+        'input[name=bombPosition]:checked'
+      )
+      ?.value;
 
-  reader.onload=()=>{
-    try{
-      const d=JSON.parse(reader.result);
-      const incoming=Array.isArray(d)
-        ?d
-        :d.records;
 
-      if(!Array.isArray(incoming))
-        throw Error();
+  const preview=
+    document
+      .getElementById(
+        'bombPreview'
+      );
 
-      if(
-        confirm(
-          `匯入 ${incoming.length} 筆資料，會取代目前資料。`
-        )
-      ){
-        records=incoming.map(normalize);
-        save();
-        render();
-      }
 
-    }catch(err){
-      alert('JSON 格式不正確，無法匯入。');
-    }
+  const image=
+    document
+      .getElementById(
+        'bombPreviewImage'
+      );
 
-    e.target.value='';
-  };
-
-  reader.readAsText(file);
-}
-
-document.getElementById('overlay')
-  .addEventListener('click',e=>{
-    if(e.target.id==='overlay')
-      closeModal();
-  });
-
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape')
-    closeModal();
 
   if(
-    e.ctrlKey &&
-    e.key.toLowerCase()==='k'
+    cat!=='侵蝕'||
+    !position
   ){
-    e.preventDefault();
-    document.getElementById('search').focus();
+
+    preview.classList.add(
+      'hidden'
+    );
+
+    image.src='';
+
+    return;
+
   }
-});
+
+
+  image.src=
+    getBombImage(position);
+
+
+  preview.classList.remove(
+    'hidden'
+  );
+
+}
+
+
+document
+  .querySelectorAll(
+    'input[name=bombPosition]'
+  )
+  .forEach(r=>
+    r.addEventListener(
+      'change',
+      updateBombPreview
+    )
+  );
+
+
+/* =========================
+   關閉
+========================= */
+
+function closeModal(){
+
+  document
+    .getElementById('overlay')
+    .style.display='none';
+
+}
+
+
+/* =========================
+   儲存
+========================= */
+
+function saveRecord(){
+
+  const category=
+    document
+      .querySelector(
+        'input[name=category]:checked'
+      )
+      ?.value;
+
+
+  const name=
+    document
+      .getElementById('f_name')
+      .value
+      .trim();
+
+
+  const role=
+    document
+      .getElementById('f_role')
+      .value;
+
+
+  const bombPosition=
+    document
+      .querySelector(
+        'input[name=bombPosition]:checked'
+      )
+      ?.value||'';
+
+
+  if(
+    !category||
+    !name||
+    !role
+  ){
+
+    alert(
+      '請完成：副本、暱稱、職業'
+    );
+
+    return;
+
+  }
+
+
+  if(
+    category==='侵蝕' &&
+    !bombPosition
+  ){
+
+    alert(
+      '侵蝕紀錄請選擇炸彈站位'
+    );
+
+    return;
+
+  }
+
+
+  const x=
+    normalize({
+
+      id:
+        editId||
+        crypto.randomUUID(),
+
+      category,
+
+      name,
+
+      role,
+
+
+      eatColor:
+        document
+          .querySelector(
+            'input[name=eatColor]:checked'
+          )
+          ?.value||'',
+
+
+      bombPosition,
+
+
+      wave:
+        document
+          .getElementById('f_wave')
+          .value
+          .trim(),
+
+
+      crystal:
+        document
+          .getElementById('f_crystal')
+          .value
+          .trim(),
+
+
+      kick:
+        document
+          .getElementById('f_kick')
+          .value
+          .trim(),
+
+
+      bomb:
+        document
+          .getElementById('f_bomb')
+          .value
+          .trim(),
+
+
+      position:
+        document
+          .getElementById('f_position')
+          .value
+          .trim(),
+
+
+      note:
+        document
+          .getElementById('f_note')
+          .value
+          .trim()
+
+    });
+
+
+  if(editId){
+
+    Object.assign(
+
+      records.find(
+        r=>r.id===editId
+      ),
+
+      x
+
+    );
+
+  }else{
+
+    records.push(x);
+
+  }
+
+
+  save();
+
+  closeModal();
+
+  render();
+
+}
+
+
+/* =========================
+   編輯
+========================= */
+
+function editRecord(id){
+
+  openModal(id);
+
+}
+
+
+/* =========================
+   複製
+========================= */
+
+function duplicateRecord(id){
+
+  const x=
+    records.find(
+      r=>r.id===id
+    );
+
+
+  records.push({
+
+    ...x,
+
+    id:
+      crypto.randomUUID(),
+
+    name:
+      x.name+'（副本）'
+
+  });
+
+
+  save();
+
+  render();
+
+}
+
+
+/* =========================
+   刪除
+========================= */
+
+function deleteRecord(id){
+
+  const x=
+    records.find(
+      r=>r.id===id
+    );
+
+
+  if(
+    confirm(
+      `確定刪除「${x.name}」？`
+    )
+  ){
+
+    records=
+      records.filter(
+        r=>r.id!==id
+      );
+
+
+    save();
+
+    render();
+
+  }
+
+}
+
+
+/* =========================
+   匯出
+========================= */
+
+function exportData(){
+
+  const blob=
+    new Blob(
+
+      [
+
+        JSON.stringify(
+
+          {
+
+            version:4,
+
+            exportedAt:
+              new Date()
+                .toISOString(),
+
+            records
+
+          },
+
+          null,
+
+          2
+
+        )
+
+      ],
+
+      {
+        type:'application/json'
+      }
+
+    );
+
+
+  const a=
+    document.createElement('a');
+
+
+  a.href=
+    URL.createObjectURL(
+      blob
+    );
+
+
+  a.download=
+    'AION2_團隊機制紀錄.json';
+
+
+  a.click();
+
+
+  URL.revokeObjectURL(
+    a.href
+  );
+
+}
+
+
+/* =========================
+   匯入
+========================= */
+
+function importData(e){
+
+  const file=
+    e.target.files[0];
+
+
+  if(!file)
+    return;
+
+
+  const reader=
+    new FileReader();
+
+
+  reader.onload=()=>{
+
+    try{
+
+      const d=
+        JSON.parse(
+          reader.result
+        );
+
+
+      const incoming=
+        Array.isArray(d)
+          ?d
+          :d.records;
+
+
+      if(
+        !Array.isArray(
+          incoming
+        )
+      )
+        throw Error();
+
+
+      if(
+
+        confirm(
+
+          `匯入 ${incoming.length} 筆資料，會取代目前資料。`
+
+        )
+
+      ){
+
+        records=
+          incoming.map(
+            normalize
+          );
+
+
+        save();
+
+        render();
+
+      }
+
+
+    }catch(err){
+
+      alert(
+        'JSON 格式不正確，無法匯入。'
+      );
+
+    }
+
+
+    e.target.value='';
+
+  };
+
+
+  reader.readAsText(file);
+
+}
+
+
+/* =========================
+   點背景關閉
+========================= */
+
+document
+  .getElementById('overlay')
+  .addEventListener(
+    'click',
+    e=>{
+
+      if(
+        e.target.id==='overlay'
+      )
+        closeModal();
+
+    }
+  );
+
+
+/* =========================
+   快捷鍵
+========================= */
+
+document
+  .addEventListener(
+    'keydown',
+    e=>{
+
+      if(e.key==='Escape')
+        closeModal();
+
+
+      if(
+        e.ctrlKey &&
+        e.key.toLowerCase()==='k'
+      ){
+
+        e.preventDefault();
+
+        document
+          .getElementById(
+            'search'
+          )
+          .focus();
+
+      }
+
+    }
+  );
+
+
+/* =========================
+   啟動
+========================= */
 
 load();
+
 </script>
+
 </body>
 </html>
+```
