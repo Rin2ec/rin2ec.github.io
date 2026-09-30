@@ -391,6 +391,53 @@ textarea{
   border-radius:9px
 }
 
+/* =========================
+   圖片放大預覽
+========================= */
+
+.image-lightbox{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.88);
+  z-index:100;
+  padding:30px;
+  align-items:center;
+  justify-content:center;
+  cursor:zoom-out;
+}
+
+.image-lightbox.show{
+  display:flex;
+}
+
+.image-lightbox img{
+  max-width:95vw;
+  max-height:92vh;
+  object-fit:contain;
+  border-radius:10px;
+  box-shadow:0 10px 40px #000;
+  cursor:default;
+}
+
+.lightbox-close{
+  position:fixed;
+  top:18px;
+  right:22px;
+  width:42px;
+  height:42px;
+  border:1px solid #ffffff33;
+  background:#111a;
+  color:#fff;
+  border-radius:50%;
+  font-size:25px;
+  cursor:pointer;
+  z-index:101;
+}
+
+.lightbox-close:hover{
+  background:#333;
+}
 
 /* =========================
    表單
@@ -1072,6 +1119,7 @@ textarea{
             id="bombPreviewImage"
             src=""
             alt="炸彈站位示意圖"
+            onclick="openLightbox(this.src)"
           >
 
         </div>
@@ -1100,6 +1148,28 @@ textarea{
   </div>
 
 </div>
+
+</div>
+
+<!-- 圖片放大預覽 -->
+<div
+  id="imageLightbox"
+  class="image-lightbox"
+  onclick="closeLightbox(event)"
+>
+
+  <button
+    class="lightbox-close"
+    onclick="closeLightbox()">
+    ×
+  </button>
+
+  <img
+    id="lightboxImage"
+    src=""
+    alt="圖片預覽"
+    onclick="event.stopPropagation()"
+  >
 
 </div>
 
@@ -1575,11 +1645,12 @@ function card(x){
                 💣 炸彈站位 ${esc(x.bombPosition)}
               </div>
 
-              <img
-                src="${getBombImage(x.bombPosition)}"
-                alt="炸彈站位 ${esc(x.bombPosition)}"
-                onerror="this.style.display='none'"
-              >
+            <img
+              src="${getBombImage(x.bombPosition)}"
+              alt="炸彈站位 ${esc(x.bombPosition)}"
+              onclick="openLightbox(this.src)"
+              onerror="this.style.display='none'"
+            >
 
             </div>
 
@@ -2278,6 +2349,82 @@ document
       updateBombPreview
     )
   );
+
+
+  /* =========================
+   圖片放大預覽
+========================= */
+
+function openLightbox(src){
+
+  if(!src)
+    return;
+
+  const lightbox=
+    document.getElementById('imageLightbox');
+
+  const image=
+    document.getElementById('lightboxImage');
+
+  image.src=src;
+
+  lightbox.classList.add('show');
+
+  document.body.style.overflow='hidden';
+}
+
+
+function closeLightbox(e){
+
+  if(
+    e &&
+    e.target &&
+    e.target.id!=='imageLightbox'
+  ){
+    return;
+  }
+
+  const lightbox=
+    document.getElementById('imageLightbox');
+
+  const image=
+    document.getElementById('lightboxImage');
+
+  lightbox.classList.remove('show');
+
+  image.src='';
+
+  document.body.style.overflow='';
+}
+
+
+/* ESC 關閉圖片預覽 */
+
+document.addEventListener('keydown',e=>{
+
+  if(e.key==='Escape'){
+
+    const lightbox=
+      document.getElementById('imageLightbox');
+
+    if(
+      lightbox &&
+      lightbox.classList.contains('show')
+    ){
+
+      lightbox.classList.remove('show');
+
+      document
+        .getElementById('lightboxImage')
+        .src='';
+
+      document.body.style.overflow='';
+
+    }
+
+  }
+
+});
 
 
 /* =========================
