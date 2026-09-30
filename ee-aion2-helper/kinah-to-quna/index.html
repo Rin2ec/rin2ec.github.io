@@ -12,6 +12,7 @@
   --bg:#090d14;
   --card:#111722;
   --card2:#151d2a;
+  --card3:#0d1420;
   --line:#273244;
   --text:#edf3ff;
   --muted:#8f9bb0;
@@ -194,7 +195,7 @@ button:hover{
 
 
 /* =========================
-   基本資訊
+   左側基本資訊
 ========================= */
 
 .base{
@@ -261,6 +262,67 @@ button:hover{
   padding:0;
 }
 
+#captureReport{
+  background:#111722;
+  border-radius:12px;
+  padding:0;
+}
+
+.capture-title{
+  display:none;
+}
+
+
+/* =========================
+   手機友善摘要卡片
+========================= */
+
+.summary-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin-bottom:14px;
+}
+
+.summary-card{
+  min-width:0;
+  padding:11px 12px;
+  background:var(--card3);
+  border:1px solid var(--line);
+  border-radius:10px;
+}
+
+.summary-label{
+  margin-bottom:4px;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.4;
+}
+
+.summary-value{
+  color:var(--text);
+  font-size:13px;
+  font-weight:700;
+  line-height:1.5;
+  word-break:break-word;
+}
+
+.summary-value .highlight-blue{
+  color:var(--blue);
+}
+
+.summary-value .highlight-yellow{
+  color:var(--yellow);
+}
+
+.summary-value .highlight-green{
+  color:var(--green);
+}
+
+.summary-value .highlight-red{
+  color:var(--red);
+}
+
 
 /* =========================
    結果表格
@@ -269,11 +331,12 @@ button:hover{
 .table-wrap{
   width:100%;
   overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
 }
 
 table{
   width:max-content;
-  min-width:360px;
+  min-width:520px;
   border-collapse:collapse;
   font-size:13px;
 }
@@ -296,14 +359,21 @@ td:first-child{
   padding-right:30px;
 }
 
-th:last-child,
-td:last-child{
+th:nth-child(2),
+td:nth-child(2),
+th:nth-child(3),
+td:nth-child(3){
   text-align:right;
 }
 
 tr:last-child td{
   border-bottom:0;
 }
+
+
+/* =========================
+   本服成本
+========================= */
 
 .scheme{
   font-weight:700;
@@ -322,6 +392,38 @@ td.base-cost b{
   color:var(--yellow);
   font-size:14px;
 }
+
+
+/* =========================
+   MyCard 成本
+========================= */
+
+th.mycard-cost{
+  color:var(--blue);
+  font-weight:700;
+}
+
+td.mycard-cost{
+  color:#b9dcff;
+  font-weight:700;
+}
+
+td.mycard-cost b{
+  color:var(--blue);
+  font-size:14px;
+}
+
+.mycard-label{
+  margin-left:3px;
+  color:var(--muted);
+  font-size:11px;
+  white-space:nowrap;
+}
+
+
+/* =========================
+   百分比
+========================= */
 
 .percent{
   margin-left:3px;
@@ -361,22 +463,7 @@ td.base-cost b{
 
 
 /* =========================
-   截圖專用樣式
-========================= */
-
-#captureReport{
-  background:#111722;
-  border-radius:12px;
-  padding:0;
-}
-
-.capture-title{
-  display:none;
-}
-
-
-/* =========================
-   手機版
+   平板 / 手機
 ========================= */
 
 @media(max-width:760px){
@@ -393,9 +480,22 @@ td.base-cost b{
     width:100%;
   }
 
+  .summary-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
 }
 
+
+/* =========================
+   小手機
+========================= */
+
 @media(max-width:420px){
+
+  h1{
+    font-size:22px;
+  }
 
   .input-row{
     grid-template-columns:1fr 1fr;
@@ -409,8 +509,21 @@ td.base-cost b{
     padding:0 10px;
   }
 
+  .summary-grid{
+    grid-template-columns:1fr;
+    gap:7px;
+  }
+
+  .summary-card{
+    padding:10px 11px;
+  }
+
+  .summary-value{
+    font-size:13px;
+  }
+
   table{
-    min-width:340px;
+    min-width:520px;
   }
 
   .result-header{
@@ -559,24 +672,6 @@ td.base-cost b{
       ></div>
 
 
-      <!-- 基本資訊 -->
-
-      <div class="base">
-
-        <div>
-          💳 MyCard：
-          <b>1000 鑽 = 475 元</b>
-        </div>
-
-        <div>
-          🏷️ MyCard 92 折：
-          <b>437.00 元</b>
-        </div>
-
-
-      </div>
-
-
       <div class="note">
         ※ 購買基納時，交易所扣除 10% 手續費，實際收到 90%。<br>
         ※ 販售鑽石時，同樣扣除 10% 手續費，販售 100 鑽實收 90 鑽。<br>
@@ -608,9 +703,9 @@ td.base-cost b{
       </div>
 
 
-      <!--
-        這一區就是實際要截圖的報表
-      -->
+      <!-- =========================
+           實際截圖範圍
+      ========================= -->
 
       <div id="captureReport">
 
@@ -619,17 +714,20 @@ td.base-cost b{
         </div>
 
 
-        <!-- 報表摘要 -->
+        <!-- =========================
+             報表摘要
+        ========================= -->
 
         <div
           id="reportSummary"
-          class="base"
-          style="margin-top:0;margin-bottom:14px;"
+          class="summary-grid"
         >
         </div>
 
 
-        <!-- 成本表 -->
+        <!-- =========================
+             成本表
+        ========================= -->
 
         <div class="table-wrap">
 
@@ -647,6 +745,10 @@ td.base-cost b{
                   1000 鑽成本
                 </th>
 
+                <th class="mycard-cost">
+                  MyCard 92 折
+                </th>
+
               </tr>
 
             </thead>
@@ -657,14 +759,6 @@ td.base-cost b{
           </table>
 
         </div>
-
-
-        <!-- 結論 -->
-
-        <div
-          class="highlight"
-          id="conclusion"
-        ></div>
 
       </div>
 
@@ -962,8 +1056,11 @@ function calculate(){
 
 
   /* -----------------------
-     更新匯率顯示
+     MyCard
   ----------------------- */
+
+  const mycard =
+    getMyCardCost();
 
 
   /* -----------------------
@@ -976,48 +1073,108 @@ function calculate(){
     )
     .innerHTML = `
 
-      <div>
-        💰 幣商價格：
-        <b>
-          ${money(rmb)} RMB
-          /
+      <div class="summary-card">
+
+        <div class="summary-label">
+          💰 幣商價格
+        </div>
+
+        <div class="summary-value">
+          <span class="highlight-yellow">
+            ${money(rmb)} RMB
+          </span>
+          ／
           ${money(oneHundredM)} TWD
-        </b>
-        （1 億基納）
+          <br>
+          <span style="font-size:11px;color:var(--muted);">
+            1 億基納
+          </span>
+        </div>
+
       </div>
 
-      <div>
-        💱 匯率：
-        <b>
-          1 RMB = ${money(exchangeRate)} TWD
-        </b>
+
+      <div class="summary-card">
+
+        <div class="summary-label">
+          💱 匯率
+        </div>
+
+        <div class="summary-value">
+          <span class="highlight-blue">
+            1 RMB = ${money(exchangeRate)} TWD
+          </span>
+        </div>
+
       </div>
 
-      <div>
-        📉 交易所手續費：
-        <b>10%</b>
-        ／ 實際收到 <b>90%</b>
+
+      <div class="summary-card">
+
+        <div class="summary-label">
+          📉 基納交易手續費
+        </div>
+
+        <div class="summary-value">
+          扣除 10%
+          ／
+          <span class="highlight-green">
+            實收 90%
+          </span>
+        </div>
+
       </div>
 
-      <div>
-        💎 販售 100 鑽：
-        <b>實收 90 鑽</b>
+
+      <div class="summary-card">
+
+        <div class="summary-label">
+          💎 鑽石販售手續費
+        </div>
+
+        <div class="summary-value">
+          販售 100 鑽
+          ／
+          <span class="highlight-green">
+            實收 90 鑽
+          </span>
+        </div>
+
       </div>
 
-      <div>
-        💰 每次兌換：
-        <b>實際取得 1,100 萬基納</b>
+
+      <div class="summary-card">
+
+        <div class="summary-label">
+          💰 每次兌換
+        </div>
+
+        <div class="summary-value">
+          實際扣除
+          <span class="highlight-blue">
+            1,100 萬基納
+          </span>
+        </div>
+
+      </div>
+
+
+      <div class="summary-card">
+
+        <div class="summary-label">
+          💳 MyCard 92 折
+        </div>
+
+        <div class="summary-value">
+          <span class="highlight-yellow">
+            ${money(mycard)} 元
+          </span>
+          ／ 1000 鑽
+        </div>
+
       </div>
 
     `;
-
-
-  /* -----------------------
-     MyCard
-  ----------------------- */
-
-  const mycard =
-    getMyCardCost();
 
 
   /* -----------------------
@@ -1094,6 +1251,7 @@ function calculate(){
             💎 ${money(price)}
           </td>
 
+
           <td class="base-cost">
 
             <b>
@@ -1110,50 +1268,19 @@ function calculate(){
 
           </td>
 
+
+          <td class="mycard-cost">
+
+            <b>
+              ${money(mycard)} 元
+            </b>
+
+          </td>
+
         </tr>
       `;
 
     }).join('');
-
-
-  /* -----------------------
-     結論
-  ----------------------- */
-
-  document
-    .getElementById(
-      'conclusion'
-    )
-    .innerHTML =
-
-      `💡 <b>目前幣商價格：` +
-      `${money(rmb)} RMB / ` +
-      `${money(oneHundredM)} TWD` +
-      `（1 億基納）</b><br>` +
-
-      `交易所扣除 10% 手續費後，` +
-      `實際收到 <b>90%</b> 基納。<br>` +
-
-      `販售鑽石同樣扣除 10% 手續費，` +
-      `販售 100 鑽實收 <b>90 鑽</b>。<br>` +
-
-      `實際取得 1 億基納需購買約 ` +
-      `<b>${money(
-        1 / KINAH_FEE_RATE
-      )} 億基納</b>，` +
-
-      `成本約 ` +
-      `<b>${money(
-        oneHundredM /
-        KINAH_FEE_RATE
-      )} TWD</b>。<br>` +
-
-      `每次實際取得 1,100 萬基納，` +
-      `需購買約 ` +
-      `<b>${money(
-        1100 /
-        KINAH_FEE_RATE
-      )} 萬基納</b>。`;
 
 }
 
